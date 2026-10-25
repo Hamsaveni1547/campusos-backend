@@ -73,7 +73,12 @@ class AcademicStructureTest extends TestCase
             ->assertStatus(409)->assertJsonPath('code', 'ACADEMIC_YEAR_OVERLAP');
 
         $odd = $this->api('POST', 'terms', $admin, ['academic_year_id' => $year['id'], 'type' => 'odd', 'name' => 'Odd Semester', 'starts_on' => '2026-08-01', 'ends_on' => '2026-12-15'])
-            ->assertCreated()->json('data');
+            ->assertCreated()->assertJsonPath('data.is_current', false)->json('data');
+
+        // Terms inside a year keep every field, including is_current = false, and leave out the year.
+        $listedTerm = $this->api('GET', 'academic-years', $admin)->assertOk()->json('data.0.terms.0');
+        $this->assertFalse($listedTerm['is_current']);
+        $this->assertArrayNotHasKey('academic_year', $listedTerm);
 
         $this->api('POST', 'terms', $admin, ['academic_year_id' => $year['id'], 'type' => 'even', 'name' => 'Even', 'starts_on' => '2026-12-01', 'ends_on' => '2027-05-15'])
             ->assertStatus(409)->assertJsonPath('code', 'TERM_OVERLAP');

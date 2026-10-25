@@ -61,16 +61,23 @@ final class AcademicResources
      */
     public static function term(Term $term, bool $withYear = true): array
     {
-        return array_filter([
+        $data = [
             'id' => $term->ulid,
             'name' => $term->name,
             'type' => $term->type->value,
-            'academic_year' => $withYear ? self::academicYear($term->academicYear) : false,
+            'academic_year' => self::academicYear($term->academicYear),
             'starts_on' => $term->starts_on->toDateString(),
             'ends_on' => $term->ends_on->toDateString(),
             'is_current' => $term->is_current,
             'status' => $term->status->value,
-        ], fn ($value): bool => $value !== false);
+        ];
+
+        // Terms listed inside their year leave out the (repeated) year.
+        if (! $withYear) {
+            unset($data['academic_year']);
+        }
+
+        return $data;
     }
 
     /**
