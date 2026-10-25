@@ -4,13 +4,13 @@ The backend exposes a versioned REST API consumed by the separate frontend repos
 
 - Base URL: `{APP_URL}/api/v1`
 - Format: JSON (`Accept: application/json`)
-- Auth: Laravel Sanctum — SPA cookie auth for the first-party frontend, bearer tokens for other clients
+- Auth: Laravel Sanctum bearer tokens (one token per signed-in device)
 
 ## Contents
 | Path | Purpose |
 |------|---------|
 | [conventions.md](conventions.md) | Request/response envelope, errors, pagination, filtering, auth, versioning rules |
-| `openapi.json` | Generated OpenAPI spec (added once the API skeleton exists) |
+| `openapi.json` | Generated OpenAPI spec (`php artisan scramble:export`); browsable at `/docs/api` in local |
 | `modules/` | One file per module (`M01-identity.md`, …) with endpoint notes, flows and examples for frontend developers |
 
 ## Rules for agents

@@ -2,24 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Modules\Identity\Actions\Roles\SyncSystemPermissions;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Permissions and built-in roles are always seeded. Demo data only outside production.
      */
-    public function run(): void
+    public function run(SyncSystemPermissions $syncPermissions): void
     {
-        // User::factory(10)->create();
+        $syncPermissions->handle();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if (! app()->isProduction()) {
+            $this->call(DemoSeeder::class);
+        }
     }
 }

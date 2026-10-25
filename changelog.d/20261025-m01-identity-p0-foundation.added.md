@@ -1,0 +1,12 @@
+Add the Phase 0 foundation: authentication, MFA, RBAC, multi-institution tenancy and shared services.
+
+- API: `/api/v1/auth/*` (login, MFA challenge, register, email verification, forgot/reset password, account setup, logout), `/me/*` (profile, password, sessions, trusted devices, MFA methods, recovery codes, notifications, preferences), `/users`, `/roles`, `/permissions`, `/role-assignments`, `/institution`, `/platform/institutions`, `/settings`, `/platform/settings`, `/audit/*`, `/files`, `/imports`, `/notification-templates`, `/notification-deliveries`, `/health`, `/admin/health`, `/platform/monitoring/*`.
+- Auth: Sanctum bearer tokens per device with lifetime and idle timeout; lockout after failed attempts; TOTP, email and SMS codes, recovery codes, trusted devices; password policy with history and expiry; forced password change and MFA enrolment gates.
+- RBAC: 12 built-in roles shared by all institutions plus custom roles; role assignments with department scope and validity dates; privilege-escalation and self-change guards.
+- Tenancy: single database with `institution_id` scoping, `X-Institution` switching, university → college hierarchy, suspension.
+- Shared kernel: append-only audit trail and security events with trace ids, private file storage with signed downloads, number sequences, typed settings per institution, CSV import framework (dry run → commit), templated notifications (in-app, email, SMS driver contract) with user preferences and delivery log.
+- DB: new tables `institutions`, `institution_user`, `role_assignments`, `user_mfa_methods`, `user_recovery_codes`, `one_time_codes`, `mfa_challenges`, `trusted_devices`, `password_histories`, `security_events`, `files`, `file_access_logs`, `number_sequences`, `settings`, `imports`, `notification_templates`, `notification_preferences`, `notification_deliveries`; spatie permission (teams = institution) and activity log tables.
+- Config: `CAMPUSOS_FRONTEND_URL`, `CAMPUSOS_MFA_ISSUER`, `CAMPUSOS_SMS_DRIVER`, `CAMPUSOS_FILES_DISK`, `SANCTUM_TOKEN_PREFIX`, `ACTIVITYLOG_RETENTION_DAYS`.
+- Packages: laravel/sanctum, spatie/laravel-permission, spatie/laravel-activitylog, spatie/laravel-query-builder, pragmarx/google2fa, bacon/bacon-qr-code; dev: dedoc/scramble, larastan/larastan.
+- Deploy: run `php artisan campusos:sync-permissions` on every deploy; run the scheduler (`schedule:work` / cron) and a queue worker.
+- Notes for frontend: see `docs/api/modules/M01-identity.md` and `docs/api/modules/P0-platform-shared.md`.

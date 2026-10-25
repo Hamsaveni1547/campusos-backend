@@ -7,11 +7,19 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "bacon/bacon-qr-code": "^3.1",
         "laravel/framework": "^13.17",
-        "laravel/tinker": "^3.0"
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^3.0",
+        "pragmarx/google2fa": "^9.1",
+        "spatie/laravel-activitylog": "^5.1",
+        "spatie/laravel-permission": "^8.3",
+        "spatie/laravel-query-builder": "^7.3"
     },
     "require-dev": {
+        "dedoc/scramble": "^0.13.49",
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.13",
         "laravel/boost": "^2.10",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",

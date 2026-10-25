@@ -13,11 +13,30 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->ulid('ulid')->unique();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('mobile', 20)->nullable()->unique();
+            $table->string('username', 64)->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('mobile_verified_at')->nullable();
             $table->string('password');
+            $table->string('status', 32)->default('active')->index();
+            $table->boolean('is_platform_admin')->default(false);
+            $table->boolean('must_change_password')->default(false);
+            $table->timestamp('password_changed_at')->nullable();
+            $table->unsignedSmallInteger('failed_login_attempts')->default(0);
+            $table->timestamp('locked_until')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->string('last_login_ip', 45)->nullable();
+            $table->string('locale', 10)->default('en');
+            $table->string('timezone', 64)->nullable();
+            $table->foreignId('avatar_file_id')->nullable();
+            $table->timestamp('deactivated_at')->nullable();
+            $table->string('deactivation_reason')->nullable();
             $table->rememberToken();
+            $table->foreignId('created_by')->nullable();
+            $table->foreignId('updated_by')->nullable();
             $table->timestamps();
         });
 
