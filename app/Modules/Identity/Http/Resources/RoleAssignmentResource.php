@@ -30,7 +30,7 @@ class RoleAssignmentResource extends JsonResource
                 'name' => $this->user->name,
                 'email' => $this->user->email,
             ]),
-            'department_id' => $this->department_id,
+            'department' => $this->department === null ? null : ['id' => $this->department->ulid, 'code' => $this->department->code, 'name' => $this->department->name],
             'valid_from' => $this->valid_from?->toIso8601String(),
             'valid_until' => $this->valid_until?->toIso8601String(),
             'reason' => $this->reason,

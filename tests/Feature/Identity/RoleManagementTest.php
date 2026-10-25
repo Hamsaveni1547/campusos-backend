@@ -4,6 +4,7 @@ namespace Tests\Feature\Identity;
 
 use App\Modules\Identity\Models\Role;
 use App\Modules\Identity\Models\RoleAssignment;
+use App\Modules\Institution\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -33,7 +34,7 @@ class RoleManagementTest extends TestCase
 
         $modules = collect($this->api('GET', 'permissions', $admin)->assertOk()->json('data'))->pluck('module');
 
-        $this->assertEqualsCanonicalizing(['admin', 'communication', 'identity', 'institution'], $modules->all());
+        $this->assertEqualsCanonicalizing(['admin', 'communication', 'hr', 'identity', 'institution'], $modules->all());
     }
 
     public function test_create_update_and_delete_custom_role(): void
@@ -121,14 +122,16 @@ class RoleManagementTest extends TestCase
         $institution = $this->institution();
         $admin = $this->member($institution, ['institution_admin']);
         $person = $this->member($institution, ['faculty']);
+        $dept = $this->api('POST', 'departments', $admin, ['code' => 'CSE', 'name' => 'CSE'])->json('data.id');
+        $deptId = Department::query()->withoutGlobalScopes()->where('ulid', $dept)->value('id');
 
-        $this->api('POST', "users/{$person->ulid}/role-assignments", $admin, ['role_id' => Role::query()->where('name', 'librarian')->value('ulid'), 'department_id' => 3])
+        $this->api('POST', "users/{$person->ulid}/role-assignments", $admin, ['role_id' => Role::query()->where('name', 'librarian')->value('ulid'), 'department_id' => $dept])
             ->assertStatus(422)->assertJsonPath('code', 'ROLE_NOT_DEPARTMENT_SCOPED');
 
-        $this->api('POST', "users/{$person->ulid}/role-assignments", $admin, ['role_id' => Role::query()->where('name', 'hod')->value('ulid'), 'department_id' => 3])
-            ->assertCreated()->assertJsonPath('data.department_id', 3);
+        $this->api('POST', "users/{$person->ulid}/role-assignments", $admin, ['role_id' => Role::query()->where('name', 'hod')->value('ulid'), 'department_id' => $dept])
+            ->assertCreated()->assertJsonPath('data.department.code', 'CSE');
 
-        $this->assertSame([3], $person->departmentIdsForRole('hod', $institution->id));
+        $this->assertSame([$deptId], $person->departmentIdsForRole('hod', $institution->id));
     }
 
     public function test_time_limited_role_expires(): void

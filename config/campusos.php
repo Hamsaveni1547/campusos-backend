@@ -1,6 +1,8 @@
 <?php
 
 use App\Modules\Communication\Authorization\CommunicationPermissions;
+use App\Modules\HR\Authorization\HRPermissions;
+use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
 use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
@@ -98,10 +100,12 @@ return [
         InstitutionPermissions::class,
         CommunicationPermissions::class,
         SystemAdminPermissions::class,
+        HRPermissions::class,
     ],
 
     'importers' => [
         'users' => UserImporter::class,
+        'employees' => EmployeeImporter::class,
     ],
 
 ];

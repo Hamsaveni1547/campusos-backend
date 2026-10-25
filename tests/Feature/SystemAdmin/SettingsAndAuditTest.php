@@ -16,7 +16,7 @@ class SettingsAndAuditTest extends TestCase
         $admin = $this->member($institution, ['institution_admin']);
 
         $groups = collect($this->api('GET', 'settings', $admin)->assertOk()->json('data'))->pluck('group');
-        $this->assertEqualsCanonicalizing(['security', 'files', 'general'], $groups->all());
+        $this->assertEqualsCanonicalizing(['security', 'files', 'general', 'hr'], $groups->all());
 
         $this->api('PUT', 'settings/security', $admin, ['password_min_length' => 4])->assertStatus(422)->assertJsonValidationErrors('password_min_length');
 

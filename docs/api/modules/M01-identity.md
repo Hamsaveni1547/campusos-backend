@@ -58,7 +58,7 @@ Use `permissions` to show/hide UI; the API enforces them anyway.
 | GET | `/me/mfa` | → enabled, required, recovery_codes_remaining, methods[] |
 | POST | `/me/mfa/totp` | current_password → secret, otpauth_uri, qr_svg (show the SVG) |
 | POST | `/me/mfa/totp/confirm` | code → method, recovery_codes (show once, ask user to save) |
-| POST | `/me/mfa/email` | current_password → sent_to |\|sms, mobile (sms), current_password → sent_to |
+| POST | `/me/mfa/email` | current_password → sent_to |
 | POST | `/me/mfa/email/confirm` | code |
 | POST | `/me/mfa/{id}/primary` | — |
 | DELETE | `/me/mfa/{id}` | current_password (blocked with `MFA_REQUIRED_BY_ROLE` for the last method) |

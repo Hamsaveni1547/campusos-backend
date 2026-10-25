@@ -77,6 +77,7 @@ enum SystemRole: string
                 'institution.*',
                 'communication.*',
                 'admin.*',
+                'hr.*',
             ],
             self::InstitutionHead => [
                 'identity.users.view',
@@ -84,6 +85,7 @@ enum SystemRole: string
                 'identity.role_assignments.view',
                 'communication.deliveries.view',
                 'admin.audit.view',
+                'hr.employees.view',
             ],
             self::HrOfficer => [
                 'identity.users.view',
@@ -91,9 +93,17 @@ enum SystemRole: string
                 'identity.users.update',
                 'identity.users.import',
                 'identity.role_assignments.view',
+                'hr.*',
+            ],
+            self::Hod => [
+                'hr.employees.view',
             ],
             self::AdminStaff => [
                 'identity.users.view',
+                'institution.batches.manage',
+                'institution.calendar.manage',
+                'institution.rooms.manage',
+                'hr.employees.view',
             ],
             default => [],
         };

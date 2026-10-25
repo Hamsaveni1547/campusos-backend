@@ -52,6 +52,15 @@ class SharedServiceProvider extends ServiceProvider
             'support_email' => ['type' => 'string', 'default' => '', 'rules' => ['nullable', 'email', 'max:255'], 'label' => 'Support email shown to users'],
         ]);
 
+        $settings->register('hr', 'Staff', [
+            'employee_code_format' => [
+                'type' => 'string',
+                'default' => '{INST}EMP{SEQ:4}',
+                'rules' => ['string', 'max:40', 'regex:/\{SEQ(:\d+)?\}/'],
+                'label' => 'Employee code format ({INST}, {YYYY}, {YY}, {SEQ:4})',
+            ],
+        ]);
+
         $this->configureRateLimits();
     }
 

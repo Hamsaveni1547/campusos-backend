@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Models;
 
 use App\Models\User;
+use App\Modules\Institution\Models\Department;
 use App\Shared\Concerns\BelongsToInstitution;
 use App\Shared\Concerns\HasPublicId;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -67,6 +68,14 @@ class RoleAssignment extends Model
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * @return BelongsTo<Department, $this>
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**
