@@ -5,7 +5,6 @@ namespace App\Modules\Identity\Actions\Auth;
 use App\Models\User;
 use App\Modules\Identity\Actions\Roles\AssignRole;
 use App\Modules\Identity\Authorization\SystemRole;
-use App\Modules\Identity\Enums\OneTimeCodeChannel;
 use App\Modules\Identity\Enums\OneTimeCodePurpose;
 use App\Modules\Identity\Enums\UserStatus;
 use App\Modules\Identity\Models\Role;
@@ -64,7 +63,7 @@ class RegisterApplicant
             });
 
             $this->securityLogger->log(SecurityEventType::UserCreated, $user, ['self_registered' => true]);
-            $this->codes->issue($user, OneTimeCodePurpose::EmailVerification, OneTimeCodeChannel::Email, $institution->id);
+            $this->codes->issue($user, OneTimeCodePurpose::EmailVerification, $institution->id);
 
             return $user;
         });

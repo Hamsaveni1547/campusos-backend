@@ -59,7 +59,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'challenge_token' => ['required', 'string', 'max:128'],
-            'method' => ['required', Rule::in([MfaMethodType::Email->value, MfaMethodType::Sms->value])],
+            'method' => ['required', Rule::in([MfaMethodType::Email->value])],
         ]);
 
         $sent = $sendCode->handle($validated['challenge_token'], MfaMethodType::from($validated['method']));
@@ -79,7 +79,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'challenge_token' => ['required', 'string', 'max:128'],
-            'method' => ['required', Rule::in(['totp', 'email', 'sms', 'recovery_code'])],
+            'method' => ['required', Rule::in(['totp', 'email', 'recovery_code'])],
             'code' => ['required', 'string', 'max:32'],
             /** Skip the second factor on this device for the configured number of days. */
             'remember_device' => ['sometimes', 'boolean'],

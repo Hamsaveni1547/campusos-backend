@@ -39,7 +39,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('purpose', 32);
-            $table->string('channel', 16);
             $table->string('destination')->nullable();
             $table->string('code_hash');
             $table->unsignedTinyInteger('attempts')->default(0);
@@ -48,7 +47,7 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'purpose', 'channel']);
+            $table->index(['user_id', 'purpose']);
         });
 
         Schema::create('mfa_challenges', function (Blueprint $table) {

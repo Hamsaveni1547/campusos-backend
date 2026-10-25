@@ -5,7 +5,6 @@ namespace App\Modules\Identity\Actions\Mfa;
 use App\Models\User;
 use App\Modules\Identity\Actions\Auth\SendMfaChallengeCode;
 use App\Modules\Identity\Enums\MfaMethodType;
-use App\Modules\Identity\Enums\OneTimeCodeChannel;
 use App\Modules\Identity\Enums\OneTimeCodePurpose;
 use App\Modules\Identity\Models\MfaMethod;
 use App\Modules\Identity\Notifications\MfaChangedNotification;
@@ -73,28 +72,18 @@ class ManageMfaMethods
     }
 
     /**
-     * Send an enrolment code for email or SMS. For SMS a new mobile number may be given.
+     * Send a code to the user's email to turn on email verification.
      */
-    public function startCodeMethod(User $user, MfaMethodType $type, ?string $mobile, ?int $institutionId): string
+    public function startEmail(User $user, ?int $institutionId): string
     {
-        if (! $type->usesOneTimeCode()) {
-            throw new BusinessRuleException('Use the authenticator setup for this method.', 'MFA_METHOD_INVALID');
-        }
-
-        $this->assertNotConfirmed($user, $type);
-
-        $destination = $type === MfaMethodType::Sms ? ($mobile ?? $user->mobile) : $user->email;
-
-        if (blank($destination)) {
-            throw new BusinessRuleException('Enter a mobile number to receive codes by SMS.', 'MOBILE_REQUIRED');
-        }
+        $this->assertNotConfirmed($user, MfaMethodType::Email);
 
         MfaMethod::query()->updateOrCreate(
-            ['user_id' => $user->id, 'type' => $type],
+            ['user_id' => $user->id, 'type' => MfaMethodType::Email],
             ['secret' => null, 'confirmed_at' => null, 'is_primary' => false],
         );
 
-        $code = $this->codes->issue($user, OneTimeCodePurpose::MfaEnrollment, $type->channel(), $institutionId, $destination);
+        $code = $this->codes->issue($user, OneTimeCodePurpose::MfaEnrollment, $institutionId);
 
         return SendMfaChallengeCode::mask((string) $code->destination);
     }
@@ -102,24 +91,19 @@ class ManageMfaMethods
     /**
      * @return array{method: MfaMethod, recovery_codes: array<int, string>|null}
      */
-    public function confirmCodeMethod(User $user, MfaMethodType $type, string $code, ?int $institutionId): array
+    public function confirmEmail(User $user, string $code, ?int $institutionId): array
     {
-        $method = $user->mfaMethods()->where('type', $type)->whereNull('confirmed_at')->first();
+        $method = $user->mfaMethods()->where('type', MfaMethodType::Email)->whereNull('confirmed_at')->first();
 
         if ($method === null) {
             throw new BusinessRuleException('Request a code first.', 'MFA_SETUP_NOT_STARTED', 409);
         }
 
-        $channel = $type->channel();
-        $destination = $this->codes->latestDestination($user, OneTimeCodePurpose::MfaEnrollment, $channel);
-
-        if (! $this->codes->verify($user, OneTimeCodePurpose::MfaEnrollment, $channel, $code, $institutionId)) {
+        if (! $this->codes->verify($user, OneTimeCodePurpose::MfaEnrollment, $code, $institutionId)) {
             throw new BusinessRuleException('The code is incorrect or has expired.', 'INVALID_CODE', 422);
         }
 
-        if ($channel === OneTimeCodeChannel::Sms) {
-            $user->forceFill(['mobile' => $destination, 'mobile_verified_at' => now()])->save();
-        } elseif ($user->email_verified_at === null) {
+        if ($user->email_verified_at === null) {
             $user->forceFill(['email_verified_at' => now()])->save();
         }
 

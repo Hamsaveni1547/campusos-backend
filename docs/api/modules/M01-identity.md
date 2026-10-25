@@ -11,9 +11,9 @@ Base: `/api/v1`. All responses use the envelope in [conventions.md](../conventio
 ```
 POST /auth/login { login, password, device_name, trusted_device_token? }
  ├─ 200 { data: { mfa_required: false, access_token, expires_at, user: <Me> } }
- └─ 200 { data: { mfa_required: true, challenge_token, challenge_expires_at, methods: ["totp","email","sms"] } }
-        ├─ (email/sms) POST /auth/mfa/send-code { challenge_token, method }
-        └─ POST /auth/mfa/verify { challenge_token, method: totp|email|sms|recovery_code, code, remember_device? }
+ └─ 200 { data: { mfa_required: true, challenge_token, challenge_expires_at, methods: ["totp","email"] } }
+        ├─ (email) POST /auth/mfa/send-code { challenge_token, method: "email" }
+        └─ POST /auth/mfa/verify { challenge_token, method: totp|email|recovery_code, code, remember_device? }
               → 200 same as successful login (+ trusted_device_token when remember_device=true)
 ```
 - `login` accepts email, username or mobile.
@@ -58,8 +58,8 @@ Use `permissions` to show/hide UI; the API enforces them anyway.
 | GET | `/me/mfa` | → enabled, required, recovery_codes_remaining, methods[] |
 | POST | `/me/mfa/totp` | current_password → secret, otpauth_uri, qr_svg (show the SVG) |
 | POST | `/me/mfa/totp/confirm` | code → method, recovery_codes (show once, ask user to save) |
-| POST | `/me/mfa/code-method` | type email\|sms, mobile (sms), current_password → sent_to |
-| POST | `/me/mfa/code-method/confirm` | type, code |
+| POST | `/me/mfa/email` | current_password → sent_to |\|sms, mobile (sms), current_password → sent_to |
+| POST | `/me/mfa/email/confirm` | code |
 | POST | `/me/mfa/{id}/primary` | — |
 | DELETE | `/me/mfa/{id}` | current_password (blocked with `MFA_REQUIRED_BY_ROLE` for the last method) |
 | POST | `/me/mfa/recovery-codes` | current_password → new codes |

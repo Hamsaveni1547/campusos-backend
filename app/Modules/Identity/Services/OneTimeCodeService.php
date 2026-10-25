@@ -3,7 +3,6 @@
 namespace App\Modules\Identity\Services;
 
 use App\Models\User;
-use App\Modules\Identity\Enums\OneTimeCodeChannel;
 use App\Modules\Identity\Enums\OneTimeCodePurpose;
 use App\Modules\Identity\Models\OneTimeCode;
 use App\Modules\Identity\Notifications\OneTimeCodeNotification;
@@ -13,7 +12,7 @@ use App\Shared\Http\RequestContext;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Issues and checks 6-digit codes sent by email or SMS. Codes are stored hashed.
+ * Issues and checks 6-digit codes sent by email. Codes are stored hashed.
  */
 class OneTimeCodeService
 {
@@ -24,20 +23,13 @@ class OneTimeCodeService
         private RequestContext $context,
     ) {}
 
-    public function issue(User $user, OneTimeCodePurpose $purpose, OneTimeCodeChannel $channel, ?int $institutionId, ?string $destination = null): OneTimeCode
+    public function issue(User $user, OneTimeCodePurpose $purpose, ?int $institutionId): OneTimeCode
     {
-        $destination ??= $channel === OneTimeCodeChannel::Sms ? $user->mobile : $user->email;
-
-        if (blank($destination)) {
-            throw new BusinessRuleException('No destination is available for this verification method.', 'OTP_DESTINATION_MISSING');
-        }
-
-        $this->guardSendRate($user, $purpose, $channel, $institutionId);
+        $this->guardSendRate($user, $purpose, $institutionId);
 
         OneTimeCode::query()
             ->where('user_id', $user->id)
             ->where('purpose', $purpose)
-            ->where('channel', $channel)
             ->whereNull('consumed_at')
             ->update(['consumed_at' => now()]);
 
@@ -47,19 +39,14 @@ class OneTimeCodeService
         $record = OneTimeCode::query()->create([
             'user_id' => $user->id,
             'purpose' => $purpose,
-            'channel' => $channel,
-            'destination' => $destination,
+            'destination' => $user->email,
             'code_hash' => Hash::make($code),
             'attempts' => 0,
             'expires_at' => now()->addMinutes($ttl),
             'ip_address' => $this->context->ip(),
         ]);
 
-        $notifiable = $destination === ($channel === OneTimeCodeChannel::Sms ? $user->mobile : $user->email)
-            ? $user
-            : (clone $user)->forceFill([$channel === OneTimeCodeChannel::Sms ? 'mobile' : 'email' => $destination]);
-
-        $notifiable->notify(new OneTimeCodeNotification($code, $purpose, $channel, $ttl));
+        $user->notify(new OneTimeCodeNotification($code, $purpose, $ttl));
 
         return $record;
     }
@@ -67,12 +54,11 @@ class OneTimeCodeService
     /**
      * Check a code. Wrong guesses count against the code; the code is consumed on success.
      */
-    public function verify(User $user, OneTimeCodePurpose $purpose, OneTimeCodeChannel $channel, string $code, ?int $institutionId): bool
+    public function verify(User $user, OneTimeCodePurpose $purpose, string $code, ?int $institutionId): bool
     {
         $record = OneTimeCode::query()
             ->where('user_id', $user->id)
             ->where('purpose', $purpose)
-            ->where('channel', $channel)
             ->whereNull('consumed_at')
             ->latest('id')
             ->first();
@@ -81,17 +67,13 @@ class OneTimeCodeService
             return false;
         }
 
-        $maxAttempts = $this->settings->int('otp_max_attempts', $institutionId);
-
-        if ($record->attempts >= $maxAttempts) {
+        if ($record->attempts >= $this->settings->int('otp_max_attempts', $institutionId)) {
             $record->forceFill(['consumed_at' => now()])->save();
 
             return false;
         }
 
-        $code = preg_replace('/\s+/', '', $code) ?? '';
-
-        if (! Hash::check($code, $record->code_hash)) {
+        if (! Hash::check(preg_replace('/\s+/', '', $code) ?? '', $record->code_hash)) {
             $record->increment('attempts');
 
             return false;
@@ -102,24 +84,13 @@ class OneTimeCodeService
         return true;
     }
 
-    public function latestDestination(User $user, OneTimeCodePurpose $purpose, OneTimeCodeChannel $channel): ?string
-    {
-        return OneTimeCode::query()
-            ->where('user_id', $user->id)
-            ->where('purpose', $purpose)
-            ->where('channel', $channel)
-            ->latest('id')
-            ->value('destination');
-    }
-
-    private function guardSendRate(User $user, OneTimeCodePurpose $purpose, OneTimeCodeChannel $channel, ?int $institutionId): void
+    private function guardSendRate(User $user, OneTimeCodePurpose $purpose, ?int $institutionId): void
     {
         $cooldown = $this->settings->int('otp_resend_cooldown_seconds', $institutionId);
 
         $last = OneTimeCode::query()
             ->where('user_id', $user->id)
             ->where('purpose', $purpose)
-            ->where('channel', $channel)
             ->latest('id')
             ->first();
 

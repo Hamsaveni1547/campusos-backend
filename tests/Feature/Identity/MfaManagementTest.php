@@ -56,7 +56,7 @@ class MfaManagementTest extends TestCase
         Notification::fake();
         $user = $this->member($this->institution());
 
-        $this->api('POST', 'me/mfa/code-method', $user, ['type' => 'email', 'current_password' => UserFactory::PASSWORD])
+        $this->api('POST', 'me/mfa/email', $user, ['current_password' => UserFactory::PASSWORD])
             ->assertOk()->assertJsonStructure(['data' => ['sent_to']]);
 
         $code = null;
@@ -66,7 +66,7 @@ class MfaManagementTest extends TestCase
             return true;
         });
 
-        $methodId = $this->api('POST', 'me/mfa/code-method/confirm', $user, ['type' => 'email', 'code' => $code])
+        $methodId = $this->api('POST', 'me/mfa/email/confirm', $user, ['code' => $code])
             ->assertOk()->json('data.method.id');
 
         $this->api('GET', 'me/mfa', $user)->assertOk()
@@ -78,27 +78,6 @@ class MfaManagementTest extends TestCase
         $this->api('GET', 'me/mfa', $user)->assertOk()
             ->assertJsonPath('data.enabled', false)
             ->assertJsonPath('data.recovery_codes_remaining', 0);
-    }
-
-    public function test_sms_enrolment_verifies_and_saves_mobile(): void
-    {
-        Notification::fake();
-        $user = $this->member($this->institution(), [], ['mobile' => null]);
-
-        $this->api('POST', 'me/mfa/code-method', $user, ['type' => 'sms', 'mobile' => '9998887776', 'current_password' => UserFactory::PASSWORD])
-            ->assertOk()->assertJsonPath('data.sent_to', '******7776');
-
-        $code = null;
-        Notification::assertSentTo($user, OneTimeCodeNotification::class, function (OneTimeCodeNotification $notification, array $channels) use (&$code): bool {
-            $code = $notification->code;
-
-            return $channels === ['sms'];
-        });
-
-        $this->api('POST', 'me/mfa/code-method/confirm', $user, ['type' => 'sms', 'code' => $code])->assertOk();
-
-        $this->assertSame('9998887776', $user->fresh()->mobile);
-        $this->assertNotNull($user->fresh()->mobile_verified_at);
     }
 
     public function test_recovery_codes_can_be_regenerated(): void

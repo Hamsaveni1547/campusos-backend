@@ -5,18 +5,16 @@ namespace App\Modules\Identity\Notifications;
 use App\Modules\Communication\Enums\NotificationCategory;
 use App\Modules\Communication\Enums\NotificationChannel;
 use App\Modules\Communication\Notifications\CampusNotification;
-use App\Modules\Identity\Enums\OneTimeCodeChannel;
 use App\Modules\Identity\Enums\OneTimeCodePurpose;
 
 /**
- * Delivers a one-time code by email or SMS. Sent immediately (not queued).
+ * Emails a one-time code. Sent immediately (not queued).
  */
 class OneTimeCodeNotification extends CampusNotification
 {
     public function __construct(
         public string $code,
         public OneTimeCodePurpose $purpose,
-        public OneTimeCodeChannel $channel,
         public int $expiresMinutes,
     ) {
         parent::__construct();
@@ -34,7 +32,7 @@ class OneTimeCodeNotification extends CampusNotification
 
     public static function description(): string
     {
-        return 'One-time code for sign-in, two-step setup and email/mobile verification.';
+        return 'One-time code for sign-in, two-step setup and email verification.';
     }
 
     public static function defaultTemplates(): array
@@ -43,9 +41,6 @@ class OneTimeCodeNotification extends CampusNotification
             'mail' => [
                 'subject' => 'Your {{ app_name }} verification code: {{ code }}',
                 'body' => "Hello {{ name }},\n\nYour code for {{ purpose }} is {{ code }}. It expires in {{ expires_minutes }} minutes.\n\nNever share this code with anyone. {{ app_name }} staff will never ask for it.",
-            ],
-            'sms' => [
-                'body' => '{{ code }} is your {{ app_name }} code for {{ purpose }}. Valid for {{ expires_minutes }} min. Do not share it.',
             ],
         ];
     }
@@ -57,7 +52,7 @@ class OneTimeCodeNotification extends CampusNotification
 
     protected function forcedChannels(): array
     {
-        return [$this->channel === OneTimeCodeChannel::Sms ? NotificationChannel::Sms : NotificationChannel::Mail];
+        return [NotificationChannel::Mail];
     }
 
     protected function variables(object $notifiable): array

@@ -40,21 +40,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | SMS
-    |--------------------------------------------------------------------------
-    |
-    | Driver used by the SMS notification channel. "log" writes messages to the
-    | application log and is meant for local development.
-    |
-    */
-
-    'sms' => [
-        'driver' => env('CAMPUSOS_SMS_DRIVER', 'log'),
-        'sender_id' => env('CAMPUSOS_SMS_SENDER_ID', 'CMPSOS'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Files
     |--------------------------------------------------------------------------
     |

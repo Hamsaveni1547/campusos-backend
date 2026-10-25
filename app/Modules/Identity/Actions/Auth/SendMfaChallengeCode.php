@@ -34,7 +34,7 @@ class SendMfaChallengeCode
             throw new BusinessRuleException('This verification method is not set up for the account.', 'MFA_METHOD_NOT_ENABLED');
         }
 
-        $code = $this->codes->issue($user, OneTimeCodePurpose::LoginChallenge, $type->channel(), $challenge->institution_id);
+        $code = $this->codes->issue($user, OneTimeCodePurpose::LoginChallenge, $challenge->institution_id);
 
         return [
             'destination' => self::mask((string) $code->destination),

@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 /**
  * @tags Notification templates
@@ -63,8 +62,8 @@ class NotificationTemplateController extends Controller
         }
 
         $validated = $request->validate([
-            'subject' => [Rule::requiredIf($channel !== NotificationChannel::Sms->value), 'nullable', 'string', 'max:255'],
-            'body' => ['required', 'string', 'max:'.($channel === NotificationChannel::Sms->value ? 480 : 10000)],
+            'subject' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string', 'max:10000'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 

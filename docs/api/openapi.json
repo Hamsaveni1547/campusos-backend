@@ -684,7 +684,6 @@
                                         "enum": [
                                             "totp",
                                             "email",
-                                            "sms",
                                             "recovery_code"
                                         ]
                                     },
@@ -838,8 +837,7 @@
                                     "method": {
                                         "type": "string",
                                         "enum": [
-                                            "email",
-                                            "sms"
+                                            "email"
                                         ]
                                     }
                                 },
@@ -3051,10 +3049,7 @@
                                 "type": "object",
                                 "properties": {
                                     "subject": {
-                                        "type": [
-                                            "string",
-                                            "null"
-                                        ],
+                                        "type": "string",
                                         "maxLength": 255
                                     },
                                     "body": {
@@ -3066,6 +3061,7 @@
                                     }
                                 },
                                 "required": [
+                                    "subject",
                                     "body"
                                 ]
                             }
@@ -6354,43 +6350,14 @@
                 }
             }
         },
-        "/me/mfa/code-method": {
+        "/me/mfa/email": {
             "post": {
-                "operationId": "v1.me.mfa.code.start",
-                "summary": "Start email or SMS code setup. A code is sent to the destination",
+                "operationId": "v1.me.mfa.email.start",
+                "summary": "Start email code setup. A code is sent to the account email",
                 "tags": [
                     "Two-step verification",
                     "Mfa"
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "email",
-                                            "sms"
-                                        ]
-                                    },
-                                    "mobile": {
-                                        "type": [
-                                            "string",
-                                            "null"
-                                        ],
-                                        "pattern": "^\\+?[0-9]{10,15}$"
-                                    }
-                                },
-                                "required": [
-                                    "type"
-                                ]
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
                         "description": "",
@@ -6418,19 +6385,16 @@
                             }
                         }
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
         },
-        "/me/mfa/code-method/confirm": {
+        "/me/mfa/email/confirm": {
             "post": {
-                "operationId": "v1.me.mfa.code.confirm",
-                "summary": "Confirm email or SMS code setup",
+                "operationId": "v1.me.mfa.email.confirm",
+                "summary": "Confirm email code setup",
                 "tags": [
                     "Two-step verification",
                     "Mfa"
@@ -6442,20 +6406,12 @@
                             "schema": {
                                 "type": "object",
                                 "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "email",
-                                            "sms"
-                                        ]
-                                    },
                                     "code": {
                                         "type": "string",
                                         "maxLength": 12
                                     }
                                 },
                                 "required": [
-                                    "type",
                                     "code"
                                 ]
                             }

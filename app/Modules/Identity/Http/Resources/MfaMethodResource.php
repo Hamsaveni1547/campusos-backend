@@ -20,7 +20,6 @@ class MfaMethodResource extends JsonResource
     {
         $destination = match ($this->type) {
             MfaMethodType::Email => $this->user->email,
-            MfaMethodType::Sms => $this->user->mobile,
             MfaMethodType::Totp => null,
         };
 

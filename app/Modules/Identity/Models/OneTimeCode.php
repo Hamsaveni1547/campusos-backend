@@ -2,19 +2,17 @@
 
 namespace App\Modules\Identity\Models;
 
-use App\Modules\Identity\Enums\OneTimeCodeChannel;
 use App\Modules\Identity\Enums\OneTimeCodePurpose;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * Hashed short-lived code sent by email or SMS.
+ * Hashed short-lived code sent by email.
  *
  * @property int $id
  * @property int $user_id
  * @property OneTimeCodePurpose $purpose
- * @property OneTimeCodeChannel $channel
  * @property string|null $destination
  * @property string $code_hash
  * @property int $attempts
@@ -22,14 +20,13 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $consumed_at
  * @property Carbon $created_at
  */
-#[Fillable(['user_id', 'purpose', 'channel', 'destination', 'code_hash', 'attempts', 'expires_at', 'consumed_at', 'ip_address'])]
+#[Fillable(['user_id', 'purpose', 'destination', 'code_hash', 'attempts', 'expires_at', 'consumed_at', 'ip_address'])]
 class OneTimeCode extends Model
 {
     protected function casts(): array
     {
         return [
             'purpose' => OneTimeCodePurpose::class,
-            'channel' => OneTimeCodeChannel::class,
             'attempts' => 'integer',
             'expires_at' => 'datetime',
             'consumed_at' => 'datetime',

@@ -4,7 +4,6 @@ namespace App\Modules\Identity\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Identity\Actions\Mfa\ManageMfaMethods;
-use App\Modules\Identity\Enums\MfaMethodType;
 use App\Modules\Identity\Http\Resources\MfaMethodResource;
 use App\Modules\Identity\Models\MfaMethod;
 use App\Modules\Identity\Services\MfaRequirement;
@@ -14,7 +13,6 @@ use App\Shared\Tenancy\CurrentInstitution;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Validation\Rule;
 
 /**
  * @tags Two-step verification
@@ -63,33 +61,25 @@ class MfaController extends Controller
     }
 
     /**
-     * Start email or SMS code setup. A code is sent to the destination.
+     * Start email code setup. A code is sent to the account email.
      */
-    public function startCodeMethod(Request $request): JsonResponse
+    public function startEmail(Request $request): JsonResponse
     {
         $this->confirmPassword($request);
 
-        $validated = $request->validate([
-            'type' => ['required', Rule::in([MfaMethodType::Email->value, MfaMethodType::Sms->value])],
-            'mobile' => ['nullable', 'required_if:type,sms', 'string', 'regex:/^\+?[0-9]{10,15}$/'],
-        ]);
-
-        $sentTo = $this->mfa->startCodeMethod($this->user($request), MfaMethodType::from($validated['type']), $validated['mobile'] ?? null, $this->currentInstitution->id());
+        $sentTo = $this->mfa->startEmail($this->user($request), $this->currentInstitution->id());
 
         return response()->json(['data' => ['sent_to' => $sentTo]]);
     }
 
     /**
-     * Confirm email or SMS code setup.
+     * Confirm email code setup.
      */
-    public function confirmCodeMethod(Request $request): JsonResponse
+    public function confirmEmail(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'type' => ['required', Rule::in([MfaMethodType::Email->value, MfaMethodType::Sms->value])],
-            'code' => ['required', 'string', 'max:12'],
-        ]);
+        $validated = $request->validate(['code' => ['required', 'string', 'max:12']]);
 
-        $result = $this->mfa->confirmCodeMethod($this->user($request), MfaMethodType::from($validated['type']), $validated['code'], $this->currentInstitution->id());
+        $result = $this->mfa->confirmEmail($this->user($request), $validated['code'], $this->currentInstitution->id());
 
         return $this->confirmed($request, $result);
     }

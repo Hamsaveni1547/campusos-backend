@@ -33,7 +33,7 @@
 | GET/PUT | `/me/notification-preferences` | `{ preferences: { general: { mail: false } } }` — security/account are mandatory |
 | GET | `/notification-templates`, `/notification-templates/{key}` [communication.templates.manage] | default + custom per channel, allowed `placeholders` |
 | PUT/DELETE | `/notification-templates/{key}/{channel}` | customise / reset; placeholders `{{ name }}` |
-| GET | `/notification-deliveries` [communication.deliveries.view] | email/SMS delivery log |
+| GET | `/notification-deliveries` [communication.deliveries.view] | email delivery log |
 
 ## Audit
 - `GET /audit/activities` [admin.audit.view] — record changes with before/after (`changes.old`, `changes.attributes`), causer, IP, `trace_id`. Filters: `log, event, causer, subject_type, subject_id, from, to`.

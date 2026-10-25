@@ -92,7 +92,7 @@ class CompleteMfaChallenge
 
         $verified = $type === MfaMethodType::Totp
             ? $this->totp->verify($method, $code)
-            : $this->codes->verify($challenge->user, OneTimeCodePurpose::LoginChallenge, $type->channel(), $code, $challenge->institution_id);
+            : $this->codes->verify($challenge->user, OneTimeCodePurpose::LoginChallenge, $code, $challenge->institution_id);
 
         if ($verified && $type !== MfaMethodType::Totp) {
             $method->forceFill(['last_used_at' => now()])->save();

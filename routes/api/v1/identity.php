@@ -43,8 +43,8 @@ Route::middleware(['auth:sanctum', 'resolve.institution:optional'])->prefix('me'
         Route::get('/', [MfaController::class, 'index'])->name('index');
         Route::post('totp', [MfaController::class, 'startTotp'])->name('totp.start');
         Route::post('totp/confirm', [MfaController::class, 'confirmTotp'])->middleware('throttle:auth')->name('totp.confirm');
-        Route::post('code-method', [MfaController::class, 'startCodeMethod'])->middleware('throttle:otp')->name('code.start');
-        Route::post('code-method/confirm', [MfaController::class, 'confirmCodeMethod'])->middleware('throttle:auth')->name('code.confirm');
+        Route::post('email', [MfaController::class, 'startEmail'])->middleware('throttle:otp')->name('email.start');
+        Route::post('email/confirm', [MfaController::class, 'confirmEmail'])->middleware('throttle:auth')->name('email.confirm');
         Route::post('recovery-codes', [MfaController::class, 'regenerateRecoveryCodes'])->name('recovery-codes');
         Route::post('{method}/primary', [MfaController::class, 'makePrimary'])->name('primary');
         Route::delete('{method}', [MfaController::class, 'destroy'])->name('destroy');

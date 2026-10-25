@@ -3,7 +3,6 @@
 namespace App\Modules\Communication\Notifications;
 
 use App\Models\User;
-use App\Modules\Communication\Channels\SmsMessage;
 use App\Modules\Communication\Enums\NotificationCategory;
 use App\Modules\Communication\Enums\NotificationChannel;
 use App\Modules\Communication\Support\NotificationPreferences;
@@ -98,10 +97,6 @@ abstract class CampusNotification extends Notification
         $category = static::category();
 
         $channels = array_filter($available, function (NotificationChannel $channel) use ($notifiable, $category): bool {
-            if ($channel === NotificationChannel::Sms && blank($notifiable->mobile ?? null)) {
-                return false;
-            }
-
             if ($category->isMandatory() || ! $notifiable instanceof User) {
                 return true;
             }
@@ -151,11 +146,6 @@ abstract class CampusNotification extends Notification
         ];
     }
 
-    public function toSms(object $notifiable): SmsMessage
-    {
-        return new SmsMessage($this->rendered(NotificationChannel::Sms, $notifiable)['body']);
-    }
-
     /**
      * Extra columns stored with in-app notifications.
      *
@@ -188,9 +178,6 @@ abstract class CampusNotification extends Notification
 
     private function laravelChannel(NotificationChannel $channel): string
     {
-        return match ($channel) {
-            NotificationChannel::Sms => 'sms',
-            default => $channel->value,
-        };
+        return $channel->value;
     }
 }
