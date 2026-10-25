@@ -30,15 +30,51 @@ class RequestContext
         $this->traceId = null;
     }
 
+    /**
+     * The end user's IP. When the call comes from a trusted CampusOS frontend server,
+     * the browser IP it forwards in X-Client-IP is used instead of the server's own.
+     */
     public function ip(): ?string
     {
-        return app()->runningInConsole() && ! app()->runningUnitTests() ? null : request()->ip();
+        if ($this->outsideRequest()) {
+            return null;
+        }
+
+        $forwarded = request()->header('X-Client-IP');
+
+        if ($this->fromTrustedFrontend() && is_string($forwarded) && filter_var($forwarded, FILTER_VALIDATE_IP) !== false) {
+            return $forwarded;
+        }
+
+        return request()->ip();
     }
 
+    /**
+     * The end user's browser. Trusted frontends forward it in X-Client-User-Agent.
+     */
     public function userAgent(): ?string
     {
-        $userAgent = app()->runningInConsole() && ! app()->runningUnitTests() ? null : request()->userAgent();
+        if ($this->outsideRequest()) {
+            return null;
+        }
+
+        $forwarded = request()->header('X-Client-User-Agent');
+        $userAgent = $this->fromTrustedFrontend() && is_string($forwarded) && $forwarded !== ''
+            ? $forwarded
+            : request()->userAgent();
 
         return $userAgent === null ? null : Str::limit($userAgent, 500, '');
+    }
+
+    private function fromTrustedFrontend(): bool
+    {
+        $trusted = array_filter(array_map('trim', explode(',', (string) config('campusos.trusted_frontends'))));
+
+        return in_array(request()->server('REMOTE_ADDR'), $trusted, true);
+    }
+
+    private function outsideRequest(): bool
+    {
+        return app()->runningInConsole() && ! app()->runningUnitTests();
     }
 }

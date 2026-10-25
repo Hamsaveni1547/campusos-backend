@@ -22,6 +22,13 @@ return [
 
     'frontend_url' => env('CAMPUSOS_FRONTEND_URL', 'http://localhost:8001'),
 
+    /*
+    | IP addresses of CampusOS frontend servers. Requests from these may pass the
+    | real browser IP and user agent in X-Client-IP / X-Client-User-Agent so that
+    | sign-in history, rate limits and audit logs show the actual user.
+    */
+    'trusted_frontends' => env('CAMPUSOS_TRUSTED_FRONTENDS', '127.0.0.1,::1'),
+
     'frontend_paths' => [
         'reset_password' => '/reset-password',
         'setup_account' => '/setup-account',

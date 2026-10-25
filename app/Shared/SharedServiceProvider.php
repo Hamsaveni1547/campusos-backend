@@ -71,22 +71,22 @@ class SharedServiceProvider extends ServiceProvider
 
             return $user instanceof User
                 ? Limit::perMinute(240)->by('user:'.$user->id)
-                : Limit::perMinute(60)->by('ip:'.$request->ip());
+                : Limit::perMinute(60)->by('ip:'.app(RequestContext::class)->ip());
         });
 
         RateLimiter::for('auth', fn (Request $request): array => [
-            Limit::perMinute(30)->by('auth-ip:'.$request->ip()),
-            Limit::perMinute(10)->by('auth-login:'.mb_strtolower((string) $request->input('login', $request->input('email', ''))).'|'.$request->ip()),
+            Limit::perMinute(30)->by('auth-ip:'.app(RequestContext::class)->ip()),
+            Limit::perMinute(10)->by('auth-login:'.mb_strtolower((string) $request->input('login', $request->input('email', ''))).'|'.app(RequestContext::class)->ip()),
         ]);
 
         RateLimiter::for('mfa', fn (Request $request): array => [
-            Limit::perMinute(20)->by('mfa-ip:'.$request->ip()),
+            Limit::perMinute(20)->by('mfa-ip:'.app(RequestContext::class)->ip()),
             Limit::perMinute(10)->by('mfa-challenge:'.hash('sha256', (string) $request->input('challenge_token', ''))),
         ]);
 
-        RateLimiter::for('otp', fn (Request $request): Limit => Limit::perMinutes(10, 6)->by('otp:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+        RateLimiter::for('otp', fn (Request $request): Limit => Limit::perMinutes(10, 6)->by('otp:'.($request->user()?->getAuthIdentifier() ?? app(RequestContext::class)->ip())));
 
-        RateLimiter::for('uploads', fn (Request $request): Limit => Limit::perMinute(30)->by('uploads:'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+        RateLimiter::for('uploads', fn (Request $request): Limit => Limit::perMinute(30)->by('uploads:'.($request->user()?->getAuthIdentifier() ?? app(RequestContext::class)->ip())));
 
         // Sanctum token model with device metadata.
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
