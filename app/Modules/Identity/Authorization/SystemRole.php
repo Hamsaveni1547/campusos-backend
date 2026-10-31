@@ -83,6 +83,7 @@ enum SystemRole: string
                 'academics.*',
                 'timetable.*',
                 'attendance.*',
+                'assessment.*',
             ],
             self::InstitutionHead => [
                 'students.records.view',
@@ -90,6 +91,7 @@ enum SystemRole: string
                 'academics.curriculum.approve',
                 'timetable.view',
                 'attendance.reports.view',
+                'assessment.reports.view',
                 'admissions.applications.view',
                 'admissions.management.approve',
                 'identity.users.view',
@@ -128,10 +130,12 @@ enum SystemRole: string
                 'attendance.corrections.approve',
                 'attendance.condonation.manage',
                 'attendance.reports.view',
+                'assessment.*',
             ],
             self::Faculty => [
                 'timetable.view',
                 'attendance.records.mark',
+                'assessment.marks.enter',
                 'students.records.view',
                 'academics.catalogue.view',
                 'academics.syllabus.track',
@@ -159,6 +163,8 @@ enum SystemRole: string
                 'attendance.records.edit',
                 'attendance.corrections.approve',
                 'attendance.reports.view',
+                'assessment.marks.lock',
+                'assessment.reports.view',
             ],
             default => [],
         };

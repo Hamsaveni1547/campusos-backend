@@ -2,6 +2,7 @@
 
 use App\Modules\Academics\Authorization\AcademicsPermissions;
 use App\Modules\Admissions\Authorization\AdmissionsPermissions;
+use App\Modules\Assessment\Authorization\AssessmentPermissions;
 use App\Modules\Attendance\Authorization\AttendancePermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
 use App\Modules\HR\Authorization\HRPermissions;
@@ -119,6 +120,7 @@ return [
         AcademicsPermissions::class,
         TimetablePermissions::class,
         AttendancePermissions::class,
+        AssessmentPermissions::class,
     ],
 
     /*
