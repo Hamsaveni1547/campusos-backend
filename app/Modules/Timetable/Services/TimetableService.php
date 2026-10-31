@@ -321,6 +321,7 @@ class TimetableService
         return [
             'entry_id' => $entryId,
             'adjustment_id' => $adjustmentId,
+            'slot_id' => $slot->ulid,
             'slot' => $slot->label,
             'starts_at' => substr($slot->starts_at, 0, 5),
             'ends_at' => substr($slot->ends_at, 0, 5),

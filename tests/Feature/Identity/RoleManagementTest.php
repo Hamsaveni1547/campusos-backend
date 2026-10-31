@@ -34,7 +34,7 @@ class RoleManagementTest extends TestCase
 
         $modules = collect($this->api('GET', 'permissions', $admin)->assertOk()->json('data'))->pluck('module');
 
-        $this->assertEqualsCanonicalizing(['academics', 'admin', 'admissions', 'communication', 'hr', 'identity', 'institution', 'students', 'timetable'], $modules->all());
+        $this->assertEqualsCanonicalizing(['academics', 'admin', 'admissions', 'attendance', 'communication', 'hr', 'identity', 'institution', 'students', 'timetable'], $modules->all());
     }
 
     public function test_create_update_and_delete_custom_role(): void
