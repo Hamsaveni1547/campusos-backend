@@ -7,6 +7,7 @@ use App\Modules\HR\Enums\EmployeeStatus;
 use App\Modules\HR\Enums\StaffType;
 use App\Modules\HR\Models\Designation;
 use App\Modules\HR\Models\Employee;
+use App\Modules\Identity\Actions\Roles\AssignRole;
 use App\Modules\Identity\Actions\Users\ChangeMembershipStatus;
 use App\Modules\Identity\Actions\Users\CreateUser;
 use App\Modules\Identity\Authorization\SystemRole;
@@ -29,6 +30,7 @@ class EmployeeService
 {
     public function __construct(
         private CreateUser $createUser,
+        private AssignRole $assignRole,
         private ChangeMembershipStatus $membership,
         private NumberGenerator $numbers,
         private SettingsRepository $settings,
@@ -64,9 +66,14 @@ class EmployeeService
             $user = $this->createUser->handle(
                 ['name' => $account['name'], 'email' => $account['email'], 'mobile' => $account['mobile'] ?? null],
                 $actor,
-                $hasRole ? [] : [$baseRole],
+                [],
                 $sendInvite,
             )['user'];
+
+            // The base role comes with the staff record (allowed by hr.employees.manage), so the system grants it.
+            if (! $hasRole) {
+                $this->assignRole->handle($user, $baseRole, null, reason: 'Staff record created');
+            }
 
             $data['employee_code'] = $code ?? $this->numbers->next(
                 'employee_code',

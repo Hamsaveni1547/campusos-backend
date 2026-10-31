@@ -9,10 +9,7 @@ use App\Modules\Admissions\Models\AdmissionSeat;
 use App\Modules\Admissions\Models\Application;
 use App\Modules\Admissions\Models\ApplicationDocument;
 use App\Modules\Admissions\Notifications\ApplicationStatusNotification;
-use App\Modules\Identity\Actions\Roles\AssignRole;
-use App\Modules\Identity\Authorization\SystemRole;
-use App\Modules\Identity\Models\Role;
-use App\Modules\Identity\Models\RoleAssignment;
+use App\Modules\Students\Services\StudentService;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Files\StoredFile;
 use App\Shared\Numbering\NumberGenerator;
@@ -30,7 +27,7 @@ class AdmissionService
         private CurrentInstitution $currentInstitution,
         private NumberGenerator $numbers,
         private SettingsRepository $settings,
-        private AssignRole $assignRole,
+        private StudentService $students,
     ) {}
 
     // ----- applicant ------------------------------------------------------
@@ -280,7 +277,7 @@ class AdmissionService
             );
 
             $this->move($application, ApplicationStatus::Admitted, $staff);
-            $this->giveStudentRole($application->user, $staff);
+            $this->students->createFromApplication($application, $staff);
 
             return $application;
         });
@@ -396,16 +393,5 @@ class AdmissionService
         }
 
         return $form;
-    }
-
-    private function giveStudentRole(User $user, User $staff): void
-    {
-        $role = Role::query()->whereNull('institution_id')->where('name', SystemRole::Student->value)->firstOrFail();
-
-        $holds = RoleAssignment::query()->effective()->where('user_id', $user->id)->where('role_id', $role->id)->exists();
-
-        if (! $holds) {
-            $this->assignRole->handle($user, $role, $staff, reason: 'Admitted through admissions');
-        }
     }
 }

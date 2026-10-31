@@ -7,6 +7,8 @@ use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
 use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
+use App\Modules\Students\Authorization\StudentsPermissions;
+use App\Modules\Students\Imports\StudentImporter;
 use App\Modules\SystemAdmin\Authorization\SystemAdminPermissions;
 
 return [
@@ -110,6 +112,7 @@ return [
         SystemAdminPermissions::class,
         HRPermissions::class,
         AdmissionsPermissions::class,
+        StudentsPermissions::class,
     ],
 
     /*
@@ -132,6 +135,7 @@ return [
     'importers' => [
         'users' => UserImporter::class,
         'employees' => EmployeeImporter::class,
+        'students' => StudentImporter::class,
     ],
 
 ];

@@ -79,8 +79,10 @@ enum SystemRole: string
                 'admin.*',
                 'hr.*',
                 'admissions.*',
+                'students.*',
             ],
             self::InstitutionHead => [
+                'students.records.view',
                 'admissions.applications.view',
                 'admissions.management.approve',
                 'identity.users.view',
@@ -100,6 +102,12 @@ enum SystemRole: string
             ],
             self::Hod => [
                 'hr.employees.view',
+                'students.records.view',
+                'students.documents.verify',
+                'students.changes.approve',
+            ],
+            self::Faculty => [
+                'students.records.view',
             ],
             self::AdminStaff => [
                 'identity.users.view',
@@ -113,6 +121,7 @@ enum SystemRole: string
                 'admissions.applications.process',
                 'admissions.seats.allocate',
                 'admissions.confirm',
+                'students.*',
             ],
             default => [],
         };

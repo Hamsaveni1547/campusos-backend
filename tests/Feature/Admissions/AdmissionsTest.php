@@ -112,6 +112,11 @@ class AdmissionsTest extends TestCase
         $this->assertSame(['draft', 'submitted', 'verified', 'eligible', 'offered', 'offer_accepted', 'admitted'], array_column($admitted['history'], 'to'));
         $this->assertTrue($applicant->fresh()->roleAssignments()->whereHas('role', fn ($query) => $query->where('name', 'student'))->exists());
 
+        $this->api('GET', 'me/student', $applicant)->assertOk()
+            ->assertJsonPath('data.register_no', $admitted['register_no'])
+            ->assertJsonPath('data.application_no', $admitted['application_no'])
+            ->assertJsonPath('data.documents.0.status', 'approved');
+
         Notification::assertSentTo($applicant, ApplicationStatusNotification::class);
     }
 
