@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Academics\AcademicsServiceProvider;
 use App\Modules\Admissions\AdmissionsServiceProvider;
 use App\Modules\Communication\CommunicationServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
@@ -12,4 +13,5 @@ return [
     CommunicationServiceProvider::class,
     IdentityServiceProvider::class,
     AdmissionsServiceProvider::class,
+    AcademicsServiceProvider::class,
 ];

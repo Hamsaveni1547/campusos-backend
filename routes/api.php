@@ -20,4 +20,5 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     require __DIR__.'/api/v1/shared.php';
     require __DIR__.'/api/v1/admissions.php';
     require __DIR__.'/api/v1/students.php';
+    require __DIR__.'/api/v1/academics.php';
 });

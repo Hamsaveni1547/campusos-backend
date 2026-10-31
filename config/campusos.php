@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Academics\Authorization\AcademicsPermissions;
 use App\Modules\Admissions\Authorization\AdmissionsPermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
 use App\Modules\HR\Authorization\HRPermissions;
@@ -113,6 +114,24 @@ return [
         HRPermissions::class,
         AdmissionsPermissions::class,
         StudentsPermissions::class,
+        AcademicsPermissions::class,
+    ],
+
+    /*
+    | Course categories used in a curriculum (value => label).
+    */
+    'academics' => [
+        'course_categories' => [
+            'core' => 'Professional core',
+            'basic_science' => 'Basic science',
+            'engineering_science' => 'Engineering science',
+            'humanities' => 'Humanities & management',
+            'professional_elective' => 'Professional elective',
+            'open_elective' => 'Open elective',
+            'lab' => 'Laboratory',
+            'project' => 'Project / internship',
+            'mandatory' => 'Mandatory (non-credit)',
+        ],
     ],
 
     /*
