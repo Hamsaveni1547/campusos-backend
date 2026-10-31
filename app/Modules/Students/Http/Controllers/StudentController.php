@@ -270,13 +270,13 @@ class StudentController extends Controller
             'category' => ['sometimes', 'nullable', 'string', 'max:30'],
             'date_of_birth' => ['sometimes', 'nullable', 'date', 'before:-14 years'],
             'gender' => ['sometimes', 'nullable', 'in:female,male,other,prefer_not_to_say'],
-            'blood_group' => ['sometimes', 'nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+            'blood_group' => ['sometimes', 'nullable', Rule::in(MyStudentController::BLOOD_GROUPS)],
             'nationality' => ['sometimes', 'nullable', 'string', 'max:50'],
             'religion' => ['sometimes', 'nullable', 'string', 'max:50'],
             'mother_tongue' => ['sometimes', 'nullable', 'string', 'max:50'],
             'address' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'permanent_address' => ['sometimes', 'nullable', 'string', 'max:1000'],
-            'id_proof_type' => ['sometimes', 'nullable', 'in:aadhaar,passport,voter_id,driving_licence,other'],
+            'id_proof_type' => ['sometimes', 'nullable', Rule::in(array_keys(MyStudentController::ID_PROOF_TYPES))],
             'id_proof_number' => ['sometimes', 'nullable', 'string', 'max:30'],
         ];
     }

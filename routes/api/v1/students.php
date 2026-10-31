@@ -5,6 +5,8 @@ use App\Modules\Students\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->group(function (): void {
+    Route::get('students/options', [MyStudentController::class, 'options'])->name('students.options');
+
     // Student self-service
     Route::get('me/student', [MyStudentController::class, 'show'])->name('me.student.show');
     Route::patch('me/student', [MyStudentController::class, 'update'])->name('me.student.update');

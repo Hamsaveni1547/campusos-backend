@@ -3,6 +3,8 @@
 namespace App\Modules\Students\Http\Controllers;
 
 use App\Models\User;
+use App\Modules\Students\Enums\GuardianRelation;
+use App\Modules\Students\Enums\StudentStatus;
 use App\Modules\Students\Http\StudentPresenter;
 use App\Modules\Students\Models\Student;
 use App\Modules\Students\Services\StudentService;
@@ -12,6 +14,7 @@ use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Validation\Rule;
 
 /**
  * The signed-in student's own record.
@@ -20,9 +23,31 @@ use Illuminate\Routing\Controller;
  */
 class MyStudentController extends Controller
 {
+    public const ID_PROOF_TYPES = ['aadhaar' => 'Aadhaar', 'passport' => 'Passport', 'voter_id' => 'Voter ID', 'driving_licence' => 'Driving licence', 'other' => 'Other'];
+
+    public const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
     private const RELATIONS = ['user', 'programme.department', 'batch', 'section', 'photo', 'application', 'guardians', 'documents.file', 'statusHistory.changer', 'changeRequests'];
 
     public function __construct(private StudentService $students) {}
+
+    /**
+     * Option lists with labels so clients never hard-code them.
+     */
+    public function options(): JsonResponse
+    {
+        $list = fn (array $items): array => collect($items)->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values()->all();
+
+        return ApiResponse::data([
+            'statuses' => collect(StudentStatus::cases())->map(fn (StudentStatus $status): array => ['value' => $status->value, 'label' => $status->label(), 'final' => $status->isFinal()])->values(),
+            'guardian_relations' => collect(GuardianRelation::cases())->map(fn (GuardianRelation $relation): array => ['value' => $relation->value, 'label' => ucfirst($relation->value)])->values(),
+            'id_proof_types' => $list(self::ID_PROOF_TYPES),
+            'blood_groups' => $list(array_combine(self::BLOOD_GROUPS, self::BLOOD_GROUPS)),
+            'genders' => $list(['female' => 'Female', 'male' => 'Male', 'other' => 'Other', 'prefer_not_to_say' => 'Prefer not to say']),
+            'self_editable' => StudentService::SELF_EDITABLE,
+            'requestable' => StudentService::REQUESTABLE,
+        ]);
+    }
 
     public function show(Request $request): JsonResponse
     {
@@ -41,7 +66,7 @@ class MyStudentController extends Controller
         $validated = $request->validate([
             'address' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'permanent_address' => ['sometimes', 'nullable', 'string', 'max:1000'],
-            'blood_group' => ['sometimes', 'nullable', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+            'blood_group' => ['sometimes', 'nullable', Rule::in(MyStudentController::BLOOD_GROUPS)],
             'mother_tongue' => ['sometimes', 'nullable', 'string', 'max:50'],
             'photo_file_id' => ['sometimes', 'nullable', 'string', 'size:26'],
         ]);
@@ -80,7 +105,7 @@ class MyStudentController extends Controller
             'changes.category' => ['sometimes', 'string', 'max:30'],
             'changes.nationality' => ['sometimes', 'string', 'max:50'],
             'changes.religion' => ['sometimes', 'string', 'max:50'],
-            'changes.id_proof_type' => ['sometimes', 'in:aadhaar,passport,voter_id,driving_licence,other'],
+            'changes.id_proof_type' => ['sometimes', Rule::in(array_keys(MyStudentController::ID_PROOF_TYPES))],
             'changes.id_proof_number' => ['sometimes', 'string', 'max:30'],
             'reason' => ['required', 'string', 'max:500'],
         ]);

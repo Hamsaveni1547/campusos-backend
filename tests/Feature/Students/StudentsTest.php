@@ -135,6 +135,7 @@ class StudentsTest extends TestCase
         // The account was created without an invite; give it the test password so it can sign in.
         $student->forceFill(['password' => Hash::make(UserFactory::PASSWORD), 'status' => UserStatus::Active, 'email_verified_at' => now(), 'must_change_password' => false])->save();
         $this->api('GET', 'me/student', $admin)->assertNotFound()->assertJsonPath('code', 'NOT_A_STUDENT');
+        $this->api('GET', 'students/options', $student)->assertOk()->assertJsonPath('data.id_proof_types.0.value', 'aadhaar')->assertJsonPath('data.statuses.0.value', 'active');
 
         $this->api('GET', 'me/student', $student)->assertOk()->assertJsonPath('data.register_no', $record['register_no'])->assertJsonPath('data.self_editable.0', 'address');
         $this->api('PATCH', 'me/student', $student, ['address' => '12, MG Road, Bengaluru', 'date_of_birth' => '2001-01-01'])->assertOk()
