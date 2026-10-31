@@ -29,6 +29,9 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('revaluation-requests', [ExamController::class, 'revaluations'])->name('revaluation-requests.index');
     Route::post('revaluation-requests/{revaluation}/decide', [ExamController::class, 'decideRevaluation'])->name('revaluation-requests.decide');
 
+    // Academic history on the student record
+    Route::get('students/{student}/academic-history', [MyExamController::class, 'studentHistory'])->name('students.academic-history');
+
     // Students
     Route::get('me/exams', [MyExamController::class, 'index'])->name('me.exams');
     Route::post('me/exam-cycles/{cycle}/backlogs', [MyExamController::class, 'registerBacklogs'])->name('me.exams.backlogs');

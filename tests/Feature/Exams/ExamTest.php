@@ -120,6 +120,9 @@ class ExamTest extends TestCase
 
         // Asha: (33 + 45) / (40 + 60) = 78% → A (8 points)
         $this->api('GET', 'me/results', $asha)->assertOk()->assertJsonPath('data.cgpa', 8)->assertJsonPath('data.results.0.courses.0.grade', 'A')->assertJsonPath('data.results.0.courses.0.can_request_revaluation', true);
+        $ashaRecord = Student::query()->whereHas('user', fn ($query) => $query->where('email', 'asha@example.edu'))->value('ulid');
+        $this->api('GET', 'students/'.$ashaRecord.'/academic-history', $admin)->assertOk()->assertJsonPath('data.cgpa', 8)->assertJsonPath('data.results.0.courses.0.grade', 'A');
+        $this->api('GET', 'students/'.$ashaRecord.'/academic-history', $bala)->assertForbidden();
         $this->api('GET', 'me/results', $bala)->assertJsonPath('data.results.0.courses.0.grade', 'AB')->assertJsonPath('data.backlogs', 1)->assertJsonPath('data.cgpa', 0);
         $this->api('GET', 'exam-cycles/'.$cycle.'/results', $admin)->assertOk()->assertJsonPath('data.summary.pass_percent', 50)->assertJsonPath('data.summary.all_clear', 1);
 

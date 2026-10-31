@@ -4,12 +4,14 @@ namespace App\Modules\Exams\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Academics\Models\Course;
+use App\Modules\Exams\Authorization\ExamPermissions;
 use App\Modules\Exams\Models\ExamCycle;
 use App\Modules\Exams\Models\ExamRegistration;
 use App\Modules\Exams\Models\ExamResult;
 use App\Modules\Exams\Models\ExamSchedule;
 use App\Modules\Exams\Models\RevaluationRequest;
 use App\Modules\Exams\Services\ExamService;
+use App\Modules\Students\Authorization\StudentsPermissions;
 use App\Modules\Students\Models\Student;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
@@ -102,7 +104,21 @@ class MyExamController extends Controller
      */
     public function results(Request $request): JsonResponse
     {
-        $student = $this->student($request);
+        return $this->history($this->student($request));
+    }
+
+    /**
+     * A student's academic history (published results, CGPA, backlogs) for staff viewing the record.
+     */
+    public function studentHistory(Request $request, Student $student): JsonResponse
+    {
+        abort_unless($this->user($request)->canAny([StudentsPermissions::RecordsView, ExamPermissions::ReportsView]), 403);
+
+        return $this->history($student);
+    }
+
+    private function history(Student $student): JsonResponse
+    {
         $results = ExamResult::query()->with('cycle')->where('student_id', $student->id)->whereHas('cycle', fn ($query) => $query->where('status', 'published'))->get()->sortByDesc('exam_cycle_id');
         $rows = ExamRegistration::query()->with('course')->where('student_id', $student->id)->whereIn('exam_cycle_id', $results->pluck('exam_cycle_id'))->get();
         $revaluations = RevaluationRequest::query()->whereIn('exam_registration_id', $rows->pluck('id'))->get()->keyBy('exam_registration_id');

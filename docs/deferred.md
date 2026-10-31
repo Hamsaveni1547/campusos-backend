@@ -1,7 +1,9 @@
 # Deferred work
 
 Everything consciously left for later, by module. Update this list when a module ships or an item is picked up.
-Status: **open** (not started), **planned** (assigned to a known later module/phase).
+Status: **open** (not started), **planned** (assigned to a known later module/phase), **done** (cleared; kept for the record).
+
+Last review (2026-11-02): only items with no dependency on a future module and no new library were cleared. Everything else waits for its module (M11 Finance, M14 Leave, M17 Feedback, M21 Analytics, P5 certificates), a notifications layer, the shared PDF service, or the one-time role-linkage and polish pass.
 
 ## Cross-cutting
 
@@ -28,7 +30,7 @@ Status: **open** (not started), **planned** (assigned to a known later module/ph
 | Certificates (bonafide, study, conduct, TC, migration) with QR verification | Phase P5 in the plan | planned (P5) |
 | Transfers (inter-section, inter-institution) | Phase P5 | planned (P5) |
 | No-dues clearance before TC | Needs library/finance/lab modules | planned (P5) |
-| Academic history (results, backlogs, CGPA) | Needs M09 results | planned (M09) |
+| Academic history (results, backlogs, CGPA) | Done after M09: results card on the student record (`GET students/{id}/academic-history`) | done |
 
 ## M05 Curriculum & teaching
 
