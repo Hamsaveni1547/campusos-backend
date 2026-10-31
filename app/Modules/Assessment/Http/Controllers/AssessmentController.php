@@ -337,12 +337,12 @@ class AssessmentController extends Controller
     // ----- corrections -----------------------------------------------------
 
     /**
-     * Mark corrections. Approvers see all; others see their own. Filter: `status`.
+     * Mark corrections. Approvers see all; others see their own. Filter: `filter[status]`.
      */
     public function corrections(Request $request): JsonResponse
     {
         $user = $this->user($request);
-        $status = $request->validate(['status' => ['nullable', Rule::in(['pending', 'approved', 'rejected'])]])['status'] ?? null;
+        $status = $request->validate(['filter.status' => ['nullable', Rule::in(['pending', 'approved', 'rejected'])]])['filter']['status'] ?? null;
 
         $corrections = MarkCorrection::query()
             ->with(['mark.assessment', 'mark.student.user', 'requester'])

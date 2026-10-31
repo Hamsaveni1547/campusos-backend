@@ -132,7 +132,7 @@ class AssessmentTest extends TestCase
         $this->api('POST', 'mark-corrections', $kavya, ['mark_id' => $markId, 'marks' => 8, 'status' => 'present', 'reason' => 'Totalling error'])->assertCreated();
         $this->api('POST', 'mark-corrections', $kavya, ['mark_id' => $markId, 'marks' => 9, 'status' => 'present', 'reason' => 'again'])->assertStatus(409)->assertJsonPath('code', 'CORRECTION_PENDING');
 
-        $correction = $this->api('GET', 'mark-corrections?status=pending', $admin)->assertOk()->assertJsonPath('data.0.current.marks', 4)->json('data.0.id');
+        $correction = $this->api('GET', 'mark-corrections?filter[status]=pending', $admin)->assertOk()->assertJsonPath('data.0.current.marks', 4)->json('data.0.id');
         $this->api('POST', 'mark-corrections/'.$correction.'/decide', $kavya, ['approve' => true])->assertForbidden();
         $this->api('POST', 'mark-corrections/'.$correction.'/decide', $admin, ['approve' => true])->assertOk();
 

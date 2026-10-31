@@ -64,5 +64,20 @@ Status: **open** (not started), **planned** (assigned to a known later module/ph
 | Question-wise marks with Bloom's level | Assessment-level marks and CO tags first | open |
 | Marks import from Excel/CSV | Manual sheet entry first | open |
 | Plagiarism check for assignments | External service | open |
-| Push locked internal marks to examinations | Needs M09 | planned (M09) |
+| Push locked internal marks to examinations | Done in M09: eligibility reads verified or locked internal marks | done |
 | At-risk inputs to analytics | Needs M21 | planned (M21) |
+
+## M09 Examinations & results
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Exam fees and fee-based eligibility | Needs M11 Finance | planned (M11) |
+| Room allocation and seating plan, exam-hall attendance sheets | Core exam flow first | open |
+| Invigilation, squad and evaluator duties with remuneration | Core exam flow first | open |
+| Double / third valuation and moderation | Single valuation first | open |
+| Malpractice cases and withheld results | Core exam flow first | open |
+| Grace marks policy | Institution rules vary; needs a design pass | open |
+| PDF hall tickets, grade cards and transcripts with QR | Printable web pages first, no PDF library added | open |
+| Practical / viva batches and practical examiner marks | Theory exams first | open |
+| Retotalling and answer-script photocopy requests | Revaluation first | open |
+| Disciplinary hold in eligibility | Needs a discipline module | open |

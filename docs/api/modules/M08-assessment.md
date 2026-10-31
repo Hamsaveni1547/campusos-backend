@@ -43,7 +43,7 @@ Internal marks per student = sum over parts of: each assessment as marks ÷ max 
 ## Corrections (after submission)
 
 - `POST mark-corrections` `{mark_id, marks?, status, reason}` by the class teacher; one pending per mark (`CORRECTION_PENDING`).
-- `GET mark-corrections?status=` — approvers see all, others their own.
+- `GET mark-corrections?filter[status]=` — approvers see all, others their own.
 - `POST mark-corrections/{id}/decide` `{approve, remarks?}` — approving changes the mark and recomputes that student; the sheet keeps its status.
 
 ## Assignments

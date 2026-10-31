@@ -84,8 +84,17 @@ enum SystemRole: string
                 'timetable.*',
                 'attendance.*',
                 'assessment.*',
+                'exams.*',
+            ],
+            self::Examiner => [
+                'academics.catalogue.view',
+                'students.records.view',
+                'exams.*',
             ],
             self::InstitutionHead => [
+                'exams.reports.view',
+                'exams.results.verify',
+                'exams.results.publish',
                 'students.records.view',
                 'academics.catalogue.view',
                 'academics.curriculum.approve',
@@ -131,8 +140,10 @@ enum SystemRole: string
                 'attendance.condonation.manage',
                 'attendance.reports.view',
                 'assessment.*',
+                'exams.reports.view',
             ],
             self::Faculty => [
+                'exams.evaluation.enter',
                 'timetable.view',
                 'attendance.records.mark',
                 'assessment.marks.enter',
@@ -165,6 +176,8 @@ enum SystemRole: string
                 'attendance.reports.view',
                 'assessment.marks.lock',
                 'assessment.reports.view',
+                'exams.cycles.manage',
+                'exams.reports.view',
             ],
             default => [],
         };

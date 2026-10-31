@@ -5,6 +5,7 @@ use App\Modules\Admissions\Authorization\AdmissionsPermissions;
 use App\Modules\Assessment\Authorization\AssessmentPermissions;
 use App\Modules\Attendance\Authorization\AttendancePermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
+use App\Modules\Exams\Authorization\ExamPermissions;
 use App\Modules\HR\Authorization\HRPermissions;
 use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
@@ -121,6 +122,7 @@ return [
         TimetablePermissions::class,
         AttendancePermissions::class,
         AssessmentPermissions::class,
+        ExamPermissions::class,
     ],
 
     /*

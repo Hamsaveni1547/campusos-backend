@@ -5,6 +5,7 @@ use App\Modules\Admissions\AdmissionsServiceProvider;
 use App\Modules\Assessment\AssessmentServiceProvider;
 use App\Modules\Attendance\AttendanceServiceProvider;
 use App\Modules\Communication\CommunicationServiceProvider;
+use App\Modules\Exams\ExamsServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Shared\SharedServiceProvider;
@@ -18,4 +19,5 @@ return [
     AcademicsServiceProvider::class,
     AttendanceServiceProvider::class,
     AssessmentServiceProvider::class,
+    ExamsServiceProvider::class,
 ];
