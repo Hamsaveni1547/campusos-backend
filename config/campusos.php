@@ -11,6 +11,7 @@ use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
 use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
+use App\Modules\QuestionBank\Authorization\QuestionBankPermissions;
 use App\Modules\Students\Authorization\StudentsPermissions;
 use App\Modules\Students\Imports\StudentImporter;
 use App\Modules\SystemAdmin\Authorization\SystemAdminPermissions;
@@ -110,6 +111,12 @@ return [
     |
     */
 
+    /*
+    | Master key for question bank encryption (base64, 32 bytes). When empty, a key derived from
+    | APP_KEY is used. Changing it makes existing questions and sealed papers unreadable.
+    */
+    'qbank_key' => env('CAMPUSOS_QBANK_KEY'),
+
     'permission_providers' => [
         IdentityPermissions::class,
         InstitutionPermissions::class,
@@ -123,6 +130,7 @@ return [
         AttendancePermissions::class,
         AssessmentPermissions::class,
         ExamPermissions::class,
+        QuestionBankPermissions::class,
     ],
 
     /*

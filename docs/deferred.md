@@ -83,3 +83,17 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | Practical / viva batches and practical examiner marks | Theory exams first | open |
 | Retotalling and answer-script photocopy requests | Revaluation first | open |
 | Disciplinary hold in eligibility | Needs a discipline module | open |
+
+## M10 Question bank & secure papers
+
+| Item | Why deferred | Status |
+|---|---|---|
+| NLP tagging (Bloom, topic, CO) and near-duplicate detection | Needs M21 AI; exact duplicates are blocked now | planned (M21) |
+| AI-drafted questions as suggestions | Needs M21 | planned (M21) |
+| Split key (two custodians) to unseal | Single master key first | open |
+| Watermarked PDF download and one-time transfer tokens | Needs the shared PDF service | open |
+| Images and math (LaTeX) in questions | Plain text first | open |
+| Question import from Excel/CSV | Manual entry first | open |
+| Reopening a sealed paper by the board, with audit | Sealed papers are final for now | open |
+| Answer keys released to evaluators after the exam | Answers are hidden on release for now | open |
+| IP allow-list for release | Window and permission checks first | open |
