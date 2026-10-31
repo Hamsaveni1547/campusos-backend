@@ -11,6 +11,7 @@ use App\Modules\Institution\Authorization\InstitutionPermissions;
 use App\Modules\Students\Authorization\StudentsPermissions;
 use App\Modules\Students\Imports\StudentImporter;
 use App\Modules\SystemAdmin\Authorization\SystemAdminPermissions;
+use App\Modules\Timetable\Authorization\TimetablePermissions;
 
 return [
 
@@ -115,6 +116,7 @@ return [
         AdmissionsPermissions::class,
         StudentsPermissions::class,
         AcademicsPermissions::class,
+        TimetablePermissions::class,
     ],
 
     /*
