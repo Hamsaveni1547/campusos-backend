@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Admissions\Authorization\AdmissionsPermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
 use App\Modules\HR\Authorization\HRPermissions;
 use App\Modules\HR\Imports\EmployeeImporter;
@@ -108,6 +109,7 @@ return [
         CommunicationPermissions::class,
         SystemAdminPermissions::class,
         HRPermissions::class,
+        AdmissionsPermissions::class,
     ],
 
     'importers' => [

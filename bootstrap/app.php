@@ -50,6 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $schedule->command('campusos:sync-role-assignments')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('campusos:prune-auth-data')->dailyAt('02:00');
+        $schedule->command('admissions:expire-offers')->hourly()->withoutOverlapping();
         $schedule->command('sanctum:prune-expired --hours=24')->daily();
         $schedule->command('activitylog:clean')->weekly();
         $schedule->command('queue:prune-failed --hours=720')->daily();
