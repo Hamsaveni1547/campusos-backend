@@ -290,7 +290,7 @@ class TimetableService
             };
 
             if ($matches) {
-                $rows[] = $this->row($entry->slot, $entry->class, $teacher, $entry->room, $change->type ?? 'scheduled', $change?->reason, $entry->ulid, $by === 'teacher' && $change?->type === 'substituted' && $entry->employee_id === $id ? 'handed_over' : null);
+                $rows[] = $this->row($entry->slot, $entry->class, $teacher, $entry->room, $change->type ?? 'scheduled', $change?->reason, $entry->ulid, $change?->ulid, $by === 'teacher' && $change?->type === 'substituted' && $entry->employee_id === $id ? 'handed_over' : null);
             }
         }
 
@@ -302,7 +302,7 @@ class TimetableService
             };
 
             if ($matches && $extra->slot !== null && $extra->class !== null) {
-                $rows[] = $this->row($extra->slot, $extra->class, $extra->employee, $extra->room, 'extra', $extra->reason, null, null);
+                $rows[] = $this->row($extra->slot, $extra->class, $extra->employee, $extra->room, 'extra', $extra->reason, null, $extra->ulid, null);
             }
         }
 
@@ -316,10 +316,11 @@ class TimetableService
     /**
      * @return array<string, mixed>
      */
-    private function row(TimeSlot $slot, OfferingSection $class, ?Employee $teacher, mixed $room, string $status, ?string $reason, ?string $entryId, ?string $note): array
+    private function row(TimeSlot $slot, OfferingSection $class, ?Employee $teacher, mixed $room, string $status, ?string $reason, ?string $entryId, ?string $adjustmentId, ?string $note): array
     {
         return [
             'entry_id' => $entryId,
+            'adjustment_id' => $adjustmentId,
             'slot' => $slot->label,
             'starts_at' => substr($slot->starts_at, 0, 5),
             'ends_at' => substr($slot->ends_at, 0, 5),
