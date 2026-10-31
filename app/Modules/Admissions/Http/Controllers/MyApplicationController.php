@@ -3,7 +3,9 @@
 namespace App\Modules\Admissions\Http\Controllers;
 
 use App\Models\User;
+use App\Modules\Admissions\Enums\ApplicationStatus;
 use App\Modules\Admissions\Enums\CycleStatus;
+use App\Modules\Admissions\Enums\Quota;
 use App\Modules\Admissions\Http\AdmissionPresenter;
 use App\Modules\Admissions\Models\AdmissionCycle;
 use App\Modules\Admissions\Models\AdmissionSeat;
@@ -41,6 +43,18 @@ class MyApplicationController extends Controller
             ->get();
 
         return ApiResponse::list($cycles, fn (AdmissionCycle $cycle): array => AdmissionPresenter::cycle($cycle, withSeats: true));
+    }
+
+    /**
+     * Quotas, statuses and categories with labels, so clients never hard-code them.
+     */
+    public function options(): JsonResponse
+    {
+        return ApiResponse::data([
+            'quotas' => collect(Quota::cases())->map(fn (Quota $quota): array => ['value' => $quota->value, 'label' => $quota->label(), 'needs_approval' => $quota->needsApproval()])->values(),
+            'statuses' => collect(ApplicationStatus::cases())->map(fn (ApplicationStatus $status): array => ['value' => $status->value, 'label' => $status->label(), 'final' => $status->isFinal()])->values(),
+            'categories' => collect((array) config('campusos.admissions.categories'))->map(fn (string $label, string $value): array => ['value' => $value, 'label' => $label])->values(),
+        ]);
     }
 
     public function index(Request $request): JsonResponse

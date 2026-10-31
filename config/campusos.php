@@ -112,6 +112,23 @@ return [
         AdmissionsPermissions::class,
     ],
 
+    /*
+    | Reservation categories an applicant can claim (value => label).
+    */
+    'admissions' => [
+        'categories' => [
+            'GM' => 'General merit',
+            'SC' => 'Scheduled Caste',
+            'ST' => 'Scheduled Tribe',
+            'CAT1' => 'Category 1',
+            '2A' => 'Category 2A',
+            '2B' => 'Category 2B',
+            '3A' => 'Category 3A',
+            '3B' => 'Category 3B',
+            'EWS' => 'Economically weaker section',
+        ],
+    ],
+
     'importers' => [
         'users' => UserImporter::class,
         'employees' => EmployeeImporter::class,

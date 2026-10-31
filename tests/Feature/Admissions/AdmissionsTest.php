@@ -87,6 +87,7 @@ class AdmissionsTest extends TestCase
         $applicant = $this->member($institution, ['applicant']);
 
         $this->api('GET', 'admissions/cycles/open', $applicant)->assertOk()->assertJsonPath('data.0.seats.0.quota', 'cet');
+        $this->api('GET', 'admissions/options', $applicant)->assertOk()->assertJsonPath('data.quotas.0.label', 'CET / Government')->assertJsonPath('data.categories.0.value', 'GM');
 
         $id = $this->submittedApplication($applicant, $cet);
         $this->api('PUT', 'me/applications/'.$id, $applicant, ['category' => 'SC'])->assertStatus(409)->assertJsonPath('code', 'APPLICATION_LOCKED');

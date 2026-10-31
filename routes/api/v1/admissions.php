@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->group(function (): void {
     // Applicant self-service
+    Route::get('admissions/options', [MyApplicationController::class, 'options'])->name('admissions.options');
     Route::get('admissions/cycles/open', [MyApplicationController::class, 'openCycles'])->name('admissions.cycles.open');
     Route::get('me/applications', [MyApplicationController::class, 'index'])->name('me.applications.index');
     Route::post('me/applications', [MyApplicationController::class, 'store'])->name('me.applications.store');

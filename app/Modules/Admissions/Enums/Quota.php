@@ -10,6 +10,17 @@ enum Quota: string
     case Lateral = 'lateral';
     case Supernumerary = 'supernumerary';
 
+    public function label(): string
+    {
+        return match ($this) {
+            self::Cet => 'CET / Government',
+            self::Management => 'Management',
+            self::Nri => 'NRI',
+            self::Lateral => 'Lateral entry',
+            self::Supernumerary => 'Supernumerary',
+        };
+    }
+
     /**
      * Management-type quotas need the institution head's approval before an offer.
      */
