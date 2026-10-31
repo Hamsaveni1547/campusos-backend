@@ -142,6 +142,56 @@ class AcademicsTest extends TestCase
         $this->api('PATCH', 'course-offerings/'.$offering['id'], $admin, ['section_ids' => [$sectionB]])->assertStatus(409)->assertJsonPath('code', 'SECTION_IN_USE');
     }
 
+    public function test_term_registration_with_electives_capacity_credits_and_approval(): void
+    {
+        ['institution' => $institution, 'admin' => $admin, 'department' => $department, 'programme' => $programme, 'batch' => $batch, 'term' => $term, 'dbms' => $dbms] = $this->setUpCampus();
+        $sectionA = $batch['sections'][0]['id'];
+
+        $ai = $this->api('POST', 'courses', $admin, ['department_id' => $department['id'], 'code' => '21CS561', 'title' => 'Artificial Intelligence', 'type' => 'theory', 'credits' => 3])->json('data');
+        $iot = $this->api('POST', 'courses', $admin, ['department_id' => $department['id'], 'code' => '21CS562', 'title' => 'Internet of Things', 'type' => 'theory', 'credits' => 3])->json('data');
+        $this->api('POST', 'course-offerings', $admin, ['course_id' => $dbms['id'], 'term_id' => $term['id'], 'section_ids' => [$sectionA]])->assertCreated();
+        $aiOffering = $this->api('POST', 'course-offerings', $admin, ['course_id' => $ai['id'], 'term_id' => $term['id'], 'section_ids' => [$sectionA], 'is_elective' => true, 'capacity' => 1])->json('data');
+        $iotOffering = $this->api('POST', 'course-offerings', $admin, ['course_id' => $iot['id'], 'term_id' => $term['id'], 'section_ids' => [$sectionA], 'is_elective' => true])->json('data');
+
+        $students = [];
+        foreach (['asha', 'bala'] as $name) {
+            $this->api('POST', 'students', $admin, ['name' => ucfirst($name), 'email' => "{$name}@example.edu", 'programme_id' => $programme['id'], 'admission_type' => 'cet', 'admitted_on' => now()->toDateString(), 'batch_id' => $batch['id'], 'section_id' => $sectionA, 'send_invite' => false])->assertCreated();
+            $students[$name] = $this->activate(User::query()->where('email', "{$name}@example.edu")->firstOrFail());
+        }
+
+        $this->api('GET', 'me/term-registration', $students['asha'])->assertOk()
+            ->assertJsonPath('data.can_register', true)
+            ->assertJsonPath('data.core.0.course.code', '21CS51')
+            ->assertJsonCount(2, 'data.electives')
+            ->assertJsonPath('data.electives.0.seats_left', 1);
+
+        $this->setting($institution, 'academics', ['max_credits_per_term' => 8]);
+        $this->api('POST', 'me/term-registration', $students['asha'], ['elective_offering_ids' => [$aiOffering['id'], $iotOffering['id']]])->assertStatus(422)->assertJsonPath('code', 'CREDIT_LIMIT');
+        $this->setting($institution, 'academics', ['max_credits_per_term' => 30]);
+
+        $this->api('POST', 'me/term-registration', $students['asha'], ['elective_offering_ids' => [$aiOffering['id']]])->assertOk()
+            ->assertJsonPath('data.registration.status', 'submitted')
+            ->assertJsonPath('data.registration.total_credits', 7)
+            ->assertJsonPath('data.can_register', false);
+        $this->api('POST', 'me/term-registration', $students['asha'], ['elective_offering_ids' => []])->assertStatus(409)->assertJsonPath('code', 'ALREADY_REGISTERED');
+        $this->api('POST', 'me/term-registration', $students['bala'], ['elective_offering_ids' => [$aiOffering['id']]])->assertStatus(409)->assertJsonPath('code', 'ELECTIVE_FULL');
+        $this->api('POST', 'me/term-registration', $students['bala'], ['elective_offering_ids' => [$iotOffering['id']]])->assertOk();
+
+        $pending = $this->api('GET', 'term-registrations?filter[status]=submitted', $admin)->assertOk()->assertJsonPath('meta.total', 2)->json('data');
+        $asha = collect($pending)->firstWhere('student.name', 'Asha');
+        $bala = collect($pending)->firstWhere('student.name', 'Bala');
+
+        $this->api('POST', 'term-registrations/decide', $admin, ['ids' => [$bala['id']], 'approve' => false])->assertStatus(422);
+        $this->api('POST', 'term-registrations/decide', $admin, ['ids' => [$bala['id']], 'approve' => false, 'remarks' => 'Pick AI instead'])->assertOk();
+        $this->api('POST', 'term-registrations/decide', $admin, ['ids' => [$asha['id']], 'approve' => true])->assertOk()->assertJsonPath('data.decided', 1);
+        $this->api('GET', 'me/term-registration', $students['bala'])->assertJsonPath('data.registration.status', 'rejected')->assertJsonPath('data.can_register', true);
+        $this->api('POST', 'me/term-registration', $students['bala'], ['elective_offering_ids' => [$iotOffering['id']]])->assertOk()->assertJsonPath('data.registration.status', 'submitted');
+
+        $class = $aiOffering['sections'][0]['id'];
+        $this->api('GET', 'offering-sections/'.$class.'/students', $admin)->assertOk()->assertJsonCount(1, 'data.students')->assertJsonPath('data.students.0.name', 'Asha');
+        $this->api('GET', 'offering-sections/'.$class.'/students', $students['bala'])->assertForbidden();
+    }
+
     public function test_permissions_and_tenancy(): void
     {
         ['admin' => $admin, 'dbms' => $dbms] = $this->setUpCampus();

@@ -1,0 +1,1 @@
+Add term registration (backend): students register each term — core courses come from their section, electives are chosen within capacity and a term credit limit (`academics.max_credits_per_term`); staff approve or reject in bulk; rejected registrations can be resubmitted; class rosters for teachers.

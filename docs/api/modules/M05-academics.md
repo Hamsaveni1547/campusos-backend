@@ -52,3 +52,12 @@ CO/PO outcomes and attainment (with assessments), elective registration (with te
 ## Error codes
 
 `SYLLABUS_IN_USE`, `CURRICULUM_LOCKED`, `CURRICULUM_EMPTY`, `CURRICULUM_NOT_APPROVED`, `TERM_OUT_OF_RANGE`, `INVALID_STATUS`, `REMARKS_REQUIRED`, `OFFERING_EXISTS`, `TERM_CLOSED`, `SECTION_MISMATCH`, `SECTION_INVALID`, `SECTION_IN_USE`, `FACULTY_NOT_ELIGIBLE`, `FACULTY_INVALID`, `ALREADY_ALLOCATED`, `TOPIC_INVALID`, `FILE_INVALID`, `COURSE_INVALID`, `DEPARTMENT_INVALID`, `PROGRAMME_INVALID`, `IN_USE`.
+
+## Term registration
+
+- `GET me/term-registration` (student) → current `term`, `credit_limit`, `registration` (status, courses, credits, remarks), `can_register`, `core[]` (offered to their section) and `electives[]` (with `capacity`, `seats_left`).
+- `POST me/term-registration` `{elective_offering_ids[]}` → core courses are added automatically; checks section placement, current term, credit limit (setting `academics.max_credits_per_term`, default 30) and elective capacity (locked). A rejected registration can be changed and submitted again.
+- `GET term-registrations` (filters `term` default current, `status`, `programme`, `section`, `search`) · `POST term-registrations/decide` `{ids[], approve, remarks}` (remarks needed to reject) — permission `academics.registrations.approve` (heads of department, admin staff, admin).
+- `GET offering-sections/{class}/students` → class roster (registered, not rejected), for the class's teachers and staff who can view.
+
+Errors: `NOT_ELIGIBLE`, `TERM_NOT_OPEN`, `ALREADY_REGISTERED`, `NO_COURSES`, `ELECTIVE_INVALID`, `ELECTIVE_FULL`, `CREDIT_LIMIT`, `NOT_A_STUDENT`.

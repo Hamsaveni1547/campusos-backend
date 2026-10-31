@@ -16,6 +16,12 @@ class AcademicsServiceProvider extends ServiceProvider
                 'rules' => ['integer', 'min:0', 'max:60'],
                 'label' => 'Maximum weekly teaching hours per teacher (0 = no warning)',
             ],
+            'max_credits_per_term' => [
+                'type' => 'int',
+                'default' => 30,
+                'rules' => ['integer', 'min:0', 'max:60'],
+                'label' => 'Maximum credits a student can register for in a term (0 = no limit)',
+            ],
         ]);
     }
 }

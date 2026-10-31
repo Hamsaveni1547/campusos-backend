@@ -115,6 +115,7 @@ enum SystemRole: string
                 'academics.allocations.manage',
                 'academics.syllabus.track',
                 'academics.materials.manage',
+                'academics.registrations.approve',
             ],
             self::Faculty => [
                 'students.records.view',
@@ -137,6 +138,7 @@ enum SystemRole: string
                 'students.*',
                 'academics.catalogue.view',
                 'academics.offerings.manage',
+                'academics.registrations.approve',
             ],
             default => [],
         };

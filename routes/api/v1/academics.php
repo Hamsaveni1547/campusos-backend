@@ -3,6 +3,7 @@
 use App\Modules\Academics\Http\Controllers\CourseController;
 use App\Modules\Academics\Http\Controllers\CurriculumController;
 use App\Modules\Academics\Http\Controllers\OfferingController;
+use App\Modules\Academics\Http\Controllers\RegistrationController;
 use App\Modules\Academics\Http\Controllers\TeachingController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,13 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::apiResource('course-offerings', OfferingController::class);
     Route::post('offering-sections/{offeringSection}/allocations', [OfferingController::class, 'allocate'])->name('offering-sections.allocate');
     Route::delete('faculty-allocations/{facultyAllocation}', [OfferingController::class, 'deallocate'])->name('faculty-allocations.destroy');
+
+    // Term registration
+    Route::get('me/term-registration', [RegistrationController::class, 'mine'])->name('me.term-registration');
+    Route::post('me/term-registration', [RegistrationController::class, 'register'])->name('me.term-registration.store');
+    Route::get('term-registrations', [RegistrationController::class, 'index'])->name('term-registrations.index');
+    Route::post('term-registrations/decide', [RegistrationController::class, 'decide'])->name('term-registrations.decide');
+    Route::get('offering-sections/{offeringSection}/students', [RegistrationController::class, 'roster'])->name('offering-sections.students');
 
     // Teaching: classes, syllabus progress and materials
     Route::get('me/teaching', [TeachingController::class, 'myTeaching'])->name('me.teaching');

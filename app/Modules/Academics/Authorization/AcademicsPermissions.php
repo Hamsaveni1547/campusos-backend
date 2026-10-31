@@ -22,6 +22,8 @@ class AcademicsPermissions implements PermissionProvider
 
     public const MaterialsManage = 'academics.materials.manage';
 
+    public const RegistrationsApprove = 'academics.registrations.approve';
+
     public static function module(): string
     {
         return 'academics';
@@ -38,6 +40,7 @@ class AcademicsPermissions implements PermissionProvider
             self::AllocationsManage => ['description' => 'Allocate faculty to classes'],
             self::SyllabusTrack => ['description' => 'Mark syllabus topics covered for allocated classes'],
             self::MaterialsManage => ['description' => 'Share course materials with students of allocated classes'],
+            self::RegistrationsApprove => ['description' => 'Review and approve student term registrations'],
         ];
     }
 }
