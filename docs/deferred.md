@@ -122,3 +122,24 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | LOP taken automatically from leave and attendance | Needs M14 Leave | planned (M14) |
 | Salary revisions with effective dates and arrears | Salaries are replaced; arrears go in as one-off earnings | open |
 | PDF / emailed payslips | Printable web payslip first | open |
+
+## M14 Leave
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Student leave applications | Students already ask for on-duty/medical attendance corrections | open |
+| Accrual, carry-forward caps and encashment | Yearly allotment first | open |
+| Multi-step approval (HOD → principal) and HOD department scoping | Waits for the role-linkage pass | open |
+| Class arrangement / substitute when faculty are on leave | Timetable adjustments can be made by hand | open |
+| Medical certificate upload | Reason text first | open |
+
+## M15 Library
+
+| Item | Why deferred | Status |
+|---|---|---|
+| ISBN lookup (Open Library) and MARC/CSV import | External service / bulk import | open |
+| Reservations / holds queue | Issue and return first | open |
+| Fines posted to student fee accounts (M11) | Fines are collected at the library counter | open |
+| Barcode labels and scanner-friendly screens | Accession numbers are typed for now | open |
+| Digital library and institutional repository | Plan phases it later | open |
+| Acquisitions, vendors and periodicals | Plan phases it later | open |

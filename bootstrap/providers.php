@@ -8,6 +8,7 @@ use App\Modules\Communication\CommunicationServiceProvider;
 use App\Modules\Exams\ExamsServiceProvider;
 use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
+use App\Modules\Library\LibraryServiceProvider;
 use App\Modules\QuestionBank\QuestionBankServiceProvider;
 use App\Providers\AppServiceProvider;
 use App\Shared\SharedServiceProvider;
@@ -24,4 +25,5 @@ return [
     ExamsServiceProvider::class,
     QuestionBankServiceProvider::class,
     FinanceServiceProvider::class,
+    LibraryServiceProvider::class,
 ];

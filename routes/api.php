@@ -28,4 +28,6 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     require __DIR__.'/api/v1/qbank.php';
     require __DIR__.'/api/v1/finance.php';
     require __DIR__.'/api/v1/payroll.php';
+    require __DIR__.'/api/v1/leave.php';
+    require __DIR__.'/api/v1/library.php';
 });

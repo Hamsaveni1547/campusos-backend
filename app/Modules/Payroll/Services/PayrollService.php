@@ -5,6 +5,7 @@ namespace App\Modules\Payroll\Services;
 use App\Models\User;
 use App\Modules\HR\Enums\EmployeeStatus;
 use App\Modules\HR\Models\Employee;
+use App\Modules\Leave\Services\LeaveService;
 use App\Modules\Payroll\Models\EmployeeSalary;
 use App\Modules\Payroll\Models\PayComponent;
 use App\Modules\Payroll\Models\PayrollRun;
@@ -48,7 +49,8 @@ class PayrollService
     }
 
     /**
-     * Starts a month with a payslip for every working employee who has a salary.
+     * Starts a month with a payslip for every working employee who has a salary; approved unpaid
+     * leave in the month is filled in as loss-of-pay days.
      */
     public function createRun(string $month): PayrollRun
     {
@@ -62,8 +64,10 @@ class PayrollService
             $employees = Employee::query()->whereIn('status', [EmployeeStatus::Active, EmployeeStatus::OnLeave])
                 ->whereIn('id', EmployeeSalary::query()->select('employee_id'))->pluck('id');
 
+            $unpaidLeave = app(LeaveService::class)->unpaidDays($month);
+
             foreach ($employees as $employeeId) {
-                Payslip::query()->create(['payroll_run_id' => $run->id, 'employee_id' => $employeeId, 'days_in_month' => $run->daysInMonth(), 'lop_days' => 0]);
+                Payslip::query()->create(['payroll_run_id' => $run->id, 'employee_id' => $employeeId, 'days_in_month' => $run->daysInMonth(), 'lop_days' => min($run->daysInMonth(), $unpaidLeave[$employeeId] ?? 0)]);
             }
 
             return $run;

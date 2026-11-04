@@ -88,6 +88,11 @@ enum SystemRole: string
                 'qbank.*',
                 'finance.*',
                 'payroll.*',
+                'leave.*',
+                'library.*',
+            ],
+            self::Librarian => [
+                'library.*',
             ],
             self::FinanceOfficer => [
                 'students.records.view',
@@ -102,6 +107,9 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'leave.approve',
+                'leave.reports.view',
+                'library.reports.view',
                 'payroll.runs.approve',
                 'payroll.reports.view',
                 'finance.reports.view',
@@ -132,8 +140,11 @@ enum SystemRole: string
                 'identity.users.import',
                 'identity.role_assignments.view',
                 'hr.*',
+                'leave.*',
             ],
             self::Hod => [
+                'leave.approve',
+                'leave.reports.view',
                 'hr.employees.view',
                 'students.records.view',
                 'students.documents.verify',
