@@ -5,13 +5,15 @@ Status: **open** (not started), **planned** (assigned to a known later module/ph
 
 Last review (2026-11-02): only items with no dependency on a future module and no new library were cleared. Everything else waits for its module (M11 Finance, M14 Leave, M17 Feedback, M21 Analytics, P5 certificates), a notifications layer, the shared PDF service, or the one-time role-linkage and polish pass.
 
+**Review 2026-11-04:** every open item below is now sorted in [enhancement-phases.md](enhancement-phases.md) into phases E1–E6, M21, or "won't do" (with the reason and a reliable alternative). That file is the plan; this file stays as the record.
+
 ## Cross-cutting
 
 | Item | Why deferred | Status |
 |---|---|---|
 | Role linkage: faculty ↔ department, class in-charge / advisor, HOD scoping for academics, timetable and attendance | Decided to revisit after the teaching modules (user, 2026-10-31) | open |
 | Frontend polish (F6 leftovers): accessibility pass, Lighthouse ≥ 90, cross-browser check, empty-state copy review, demo notes | Postponed to keep building modules | open |
-| Demo seed data for admissions, students, curriculum, timetable, attendance, marks | Pages start empty locally | open |
+| Demo seed data for admissions, students, curriculum, timetable, attendance, marks | Pages start empty locally | done (demo seeders) |
 | Notifications for new events (registration decisions, timetable changes, attendance shortage, marks published) | Core flows first | open |
 
 ## M03 Admissions
