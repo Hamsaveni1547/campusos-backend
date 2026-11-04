@@ -14,6 +14,7 @@ use Database\Seeders\Demo\FeeSeeder;
 use Database\Seeders\Demo\InstitutionSetupSeeder;
 use Database\Seeders\Demo\LeaveSeeder;
 use Database\Seeders\Demo\LibrarySeeder;
+use Database\Seeders\Demo\MentoringSeeder;
 use Database\Seeders\Demo\PastSemesterSeeder;
 use Database\Seeders\Demo\PayrollSeeder;
 use Database\Seeders\Demo\QuestionBankSeeder;
@@ -63,6 +64,7 @@ class DatabaseSeeder extends Seeder
             LibrarySeeder::class,
             AssetSeeder::class,
             FeedbackSeeder::class,
+            MentoringSeeder::class,
         ]);
 
         $this->command?->table(['Sign in as', 'Email'], [

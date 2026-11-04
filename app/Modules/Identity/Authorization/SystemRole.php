@@ -92,6 +92,7 @@ enum SystemRole: string
                 'library.*',
                 'assets.*',
                 'feedback.*',
+                'mentoring.*',
             ],
             self::Librarian => [
                 'library.*',
@@ -109,6 +110,8 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'mentoring.reports.view',
+                'mentoring.notes.confidential',
                 'assets.reports.view',
                 'feedback.*',
                 'leave.approve',
@@ -147,6 +150,9 @@ enum SystemRole: string
                 'leave.*',
             ],
             self::Hod => [
+                'mentoring.allocate',
+                'mentoring.mentor',
+                'mentoring.reports.view',
                 'assets.reports.view',
                 'assets.rooms.book',
                 'feedback.results.view',
@@ -181,6 +187,7 @@ enum SystemRole: string
                 'qbank.papers.review',
             ],
             self::Faculty => [
+                'mentoring.mentor',
                 'assets.rooms.book',
                 'exams.evaluation.enter',
                 'qbank.questions.contribute',

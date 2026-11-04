@@ -165,3 +165,12 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | Mandatory feedback before hall tickets | Configurable rule later | open |
 | Complaint escalation chain and auto-routing to departments | SLA overdue flag and manual assignment first | open |
 | Attachments on complaints | Text first | open |
+
+## M18 Mentoring
+
+| Item | Why deferred | Status |
+|---|---|---|
+| At-risk prediction from trends (rule-based flags today) | Needs M21 | planned (M21) |
+| Mentor–mentee messaging and parent communication log | Notes and meetings first; messaging belongs with M19/M20 | open |
+| HOD scoping of allocation and at-risk lists to their own department | Section filter first | open |
+| Counsellor role and referral workflow | Confidential-notes permission first | open |

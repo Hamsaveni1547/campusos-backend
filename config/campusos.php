@@ -16,6 +16,7 @@ use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
 use App\Modules\Leave\Authorization\LeavePermissions;
 use App\Modules\Library\Authorization\LibraryPermissions;
+use App\Modules\Mentoring\Authorization\MentoringPermissions;
 use App\Modules\Payroll\Authorization\PayrollPermissions;
 use App\Modules\QuestionBank\Authorization\QuestionBankPermissions;
 use App\Modules\Students\Authorization\StudentsPermissions;
@@ -143,6 +144,7 @@ return [
         LibraryPermissions::class,
         AssetPermissions::class,
         FeedbackPermissions::class,
+        MentoringPermissions::class,
     ],
 
     /*
