@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Finance\Http\Controllers\FinanceController;
+use App\Modules\Finance\Http\Controllers\OnlinePaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->group(function (): void {
@@ -34,4 +35,7 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('finance/reports/dues', [FinanceController::class, 'dues'])->name('finance.reports.dues');
 
     Route::get('me/fees', [FinanceController::class, 'mine'])->name('me.fees');
+    Route::get('me/online-payments', [OnlinePaymentController::class, 'index'])->name('me.online-payments.index');
+    Route::post('me/online-payments', [OnlinePaymentController::class, 'start'])->name('me.online-payments.start');
+    Route::post('me/online-payments/{onlinePayment}/complete', [OnlinePaymentController::class, 'complete'])->name('me.online-payments.complete');
 });

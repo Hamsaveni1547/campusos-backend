@@ -39,3 +39,20 @@ Errors: `NOT_DRAFT`, `NOT_PUBLISHED`, `EMPTY_AUDIENCE`, `NO_ACK_NEEDED`.
 | leave-register | leave.reports.view | from, to |
 | library-overdue | library.reports.view | — |
 | complaints-summary | feedback.complaints.handle | — |
+
+## E1 additions
+
+- Announcements take `publish_at`; publishing a draft with a future time sets status `scheduled`. `campusos:alerts announcements` (every minute) sends them. Withdrawing a scheduled one returns it to draft.
+- `announcements/audiences` returns `limits.departments` and `limits.sections` (ULIDs, or null for no limit). Posting outside them fails with `OUT_OF_SCOPE` (403).
+- Leave applications and mentoring allocation/at-risk lists are limited to a HOD's department.
+- Notifications: `exams.results_published`, `timetable.published`, `attendance.shortage` (weekly, `campusos:alerts attendance`), `finance.fee_reminder` (daily, `campusos:alerts fees`). All templates can be edited.
+
+## Simulated online payment (demo)
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `me/online-payments` | My attempts |
+| POST | `me/online-payments` | `amount?` (default everything due), `demand_ids[]?` → pending attempt |
+| POST | `me/online-payments/{id}/complete` | `method` upi\|card\|netbanking, `outcome` success\|failure. A success records a normal fee receipt |
+
+Errors: `NOTHING_DUE`, `OVERPAYMENT`, `ALREADY_COMPLETED`.

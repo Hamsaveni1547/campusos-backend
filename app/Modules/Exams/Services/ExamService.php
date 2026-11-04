@@ -8,6 +8,7 @@ use App\Modules\Academics\Models\OfferingSection;
 use App\Modules\Assessment\Models\InternalMark;
 use App\Modules\Assessment\Models\InternalMarkSheet;
 use App\Modules\Attendance\Services\AttendanceService;
+use App\Modules\Communication\Services\CampusAlerts;
 use App\Modules\Exams\Models\ExamCycle;
 use App\Modules\Exams\Models\ExamRegistration;
 use App\Modules\Exams\Models\ExamResult;
@@ -275,6 +276,7 @@ class ExamService
     {
         $this->assertStatus($cycle, 'results_verified');
         $cycle->forceFill(['status' => 'published', 'published_by' => $user->id, 'published_at' => now()])->save();
+        app(CampusAlerts::class)->resultsPublished($cycle);
     }
 
     // ----- revaluation -----------------------------------------------------

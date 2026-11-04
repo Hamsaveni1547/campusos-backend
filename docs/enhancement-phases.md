@@ -2,6 +2,8 @@
 
 This plan sorts every open item in `docs/deferred.md`. Each item either goes into an enhancement phase, is replaced by a simpler and reliable alternative, or is dropped with a reason. Phases run in order after testing with real use; AI work (M21) runs alongside.
 
+**Scope update (user, 2026-11-04):** this is a college demo. Build only important, usable and impressive features, in basic versions. No statutory depth (TDS stays a simple deduction), no external services, no deployment-level complexity. The payment gateway is a simulation, and PDFs may use a Laravel PDF library (dompdf).
+
 Rules used:
 - No external services (SMS, payment gateways, third-party APIs) and no new heavy libraries.
 - Prefer what the browser or the existing stack already does well (print to PDF, CSV opened in Excel, the Laravel scheduler, mail).
@@ -9,7 +11,9 @@ Rules used:
 
 ---
 
-## E1 — Roles, scoping and notifications (foundation)
+## E1 — Roles, scoping and notifications (foundation) — done 2026-11-04
+
+Built: a shared department scope for HODs (leave approvals, mentoring, announcements), teachers posting only to sections they teach, notifications for published results and timetables, weekly attendance-shortage alerts (to the student and mentor), fee due/overdue reminders, scheduled announcements, and a simulated online fee payment. Dropped as not worth the complexity for a demo: two-step leave approval, daily digest, scheduled report emails.
 
 Do this first, because several later items depend on it.
 
@@ -19,13 +23,13 @@ Do this first, because several later items depend on it.
 | HOD scoping of mentoring allocation and at-risk lists | M18 | Uses the shared scope. |
 | HOD scoping of reports and dashboard | M20 | Uses the shared scope. |
 | Strict announcement scope: teachers to own sections, HODs to own department | M19 | Teachers get sections they teach (from class allocations); HODs get their department. |
-| Multi-step leave approval (HOD → principal) and HOD scoping | M14 | Two steps, configurable per leave type. |
+| HOD scoping of leave approvals | M14 | Done. Two-step approval dropped. |
 | Notifications for events: registration decisions, timetable changes, attendance shortage, marks and results published | Cross-cutting | One notification class per event on the existing notification hub, so institutions can edit the templates. |
 | Weekly attendance shortage alerts to student and mentor | M07 | Scheduled command, weekly. |
 | Fee instalment reminders | M11 | Scheduled reminder before and after the due date. |
 | Scheduled publishing of announcements | M19 | Store a `publish_at` time; a scheduler job publishes when it is due. |
-| Daily digest email | M19 | Optional user setting, sent by the scheduler. |
-| Scheduled report emails | M20 | Weekly CSV attached to an email, using the existing catalogue. |
+| Daily digest email | M19 | Dropped (not needed for a demo). |
+| Scheduled report emails | M20 | Dropped (CSV download is enough). |
 
 ## E2 — Imports, attachments and exports
 
@@ -41,9 +45,9 @@ Do this first, because several later items depend on it.
 | iCal export of timetables | M06 | Plain-text `.ics` feed per teacher, student and room; no library needed. |
 | Saved report filters | M20 | Saved per user. |
 
-## E3 — Printable documents (instead of a PDF library)
+## E3 — Printable documents
 
-**Reliable option:** print-ready pages styled with `@media print`. The browser's "Save as PDF" gives a clean PDF with no server dependency. Each document also gets a public **verification page** at a signed URL with a short code printed on it, so anyone can confirm it is genuine. This is used instead of a QR library.
+**Updated:** generate real PDFs with a Laravel PDF library (dompdf), with no external service. Fallback: print-ready pages styled with `@media print`. The browser's "Save as PDF" gives a clean PDF with no server dependency. Each document also gets a public **verification page** at a signed URL with a short code printed on it, so anyone can confirm it is genuine. This is used instead of a QR library.
 
 | Item | From |
 |---|---|
@@ -126,7 +130,7 @@ NLP on feedback and complaints, at-risk prediction, AI summaries of circulars, d
 
 | Item | From | Why | Reliable alternative |
 |---|---|---|---|
-| Online payment gateway and gateway webhooks | M11 | External service and merchant onboarding; you asked for no payment gateways | Counter and UPI/NEFT recording with references, plus bank-statement reconciliation (E5) |
+| Real online payment gateway and webhooks | M11 | External service and merchant onboarding | Built in E1: a simulated gateway (CampusPay) where the student picks UPI, card or net banking and chooses success or failure; a success creates a normal receipt |
 | SMS, WhatsApp and push notifications | M19 | External paid services | Email and in-app notifications, plus the daily digest (E1) |
 | WebSockets (real-time) | M19 | Extra server process to run and monitor | Polling every 30–60 seconds already works |
 | QR or geo-fenced self check-in, biometric import | M07 | Easy to fake from a shared screenshot or GPS spoofing; biometric devices need vendor drivers | The teacher marks attendance; students raise corrections |

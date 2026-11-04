@@ -9,6 +9,7 @@ use App\Modules\Leave\Models\LeaveApplication;
 use App\Modules\Leave\Models\LeaveBalance;
 use App\Modules\Leave\Models\LeaveType;
 use App\Modules\Leave\Services\LeaveService;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Tenancy\CurrentInstitution;
@@ -107,12 +108,14 @@ class LeaveController extends Controller
         $user = $this->user($request);
         abort_unless($user->canAny([P::Approve, P::ReportsView]), 403);
         $f = (array) $request->input('filter', []);
+        $departments = DepartmentScope::for($user, [P::Approve, P::ReportsView]);
 
         $applications = LeaveApplication::query()->with(['employee.user', 'employee.department', 'type', 'decider'])
             ->when($f['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
             ->when($f['from'] ?? null, fn ($q, $from) => $q->whereDate('to_date', '>=', $from))
             ->when($f['to'] ?? null, fn ($q, $to) => $q->whereDate('from_date', '<=', $to))
             ->when($f['department'] ?? null, fn ($q, $ulid) => $q->whereHas('employee.department', fn ($d) => $d->where('ulid', $ulid)))
+            ->when($departments !== null, fn ($q) => $q->whereHas('employee', fn ($e) => $e->whereIn('department_id', $departments)))
             ->orderByDesc('from_date')->paginate(25);
 
         return ApiResponse::paginated($applications, fn (LeaveApplication $a): array => [...$this->application($a), 'can_decide' => $a->status === 'pending' && $user->can(P::Approve) && $a->employee->user_id !== $user->id]);
@@ -121,6 +124,7 @@ class LeaveController extends Controller
     public function decide(Request $request, LeaveApplication $application): JsonResponse
     {
         Gate::authorize(P::Approve);
+        abort_unless(DepartmentScope::allows($this->user($request), P::Approve, $application->employee->department_id), 403);
         $validated = $request->validate(['approve' => ['required', 'boolean'], 'remarks' => ['nullable', 'string', 'max:500']]);
         $this->leave->decide($application, (bool) $validated['approve'], $validated['remarks'] ?? null, $this->user($request));
 

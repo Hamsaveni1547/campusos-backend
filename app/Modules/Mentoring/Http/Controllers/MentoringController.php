@@ -16,6 +16,7 @@ use App\Modules\Mentoring\Models\MentoringNote;
 use App\Modules\Mentoring\Models\StudentConcern;
 use App\Modules\Mentoring\Services\MentoringService;
 use App\Modules\Students\Models\Student;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -41,7 +42,8 @@ class MentoringController extends Controller
     public function assignments(Request $request): JsonResponse
     {
         abort_unless($this->user($request)->canAny([P::Allocate, P::ReportsView]), 403);
-        $section = Section::query()->where('ulid', (string) $request->validate(['filter.section' => ['required', 'string', 'size:26']])['filter']['section'])->firstOrFail();
+        $section = Section::query()->with('batch.programme')->where('ulid', (string) $request->validate(['filter.section' => ['required', 'string', 'size:26']])['filter']['section'])->firstOrFail();
+        abort_unless(DepartmentScope::allows($this->user($request), [P::Allocate, P::ReportsView], $section->batch->programme->department_id), 403);
         $students = Student::query()->with('user')->where('section_id', $section->id)->whereNotIn('status', ['graduated', 'dropped_out', 'transferred_out'])->orderByRaw('roll_no is null, roll_no')->get();
         $current = MentorAssignment::query()->current()->with('mentor.user')->whereIn('student_id', $students->pluck('id'))->get()->keyBy('student_id');
 
@@ -55,8 +57,10 @@ class MentoringController extends Controller
     {
         Gate::authorize(P::Allocate);
         $validated = $request->validate(['section_ids' => ['required', 'array', 'min:1'], 'section_ids.*' => ['string', 'size:26'], 'mentor_ids' => ['required', 'array', 'min:1'], 'mentor_ids.*' => ['string', 'size:26']]);
+        $departments = DepartmentScope::for($this->user($request), P::Allocate);
         $count = $this->mentoring->allocate(
-            Section::query()->whereIn('ulid', $validated['section_ids'])->pluck('id')->all(),
+            Section::query()->whereIn('ulid', $validated['section_ids'])
+                ->when($departments !== null, fn ($q) => $q->whereHas('batch.programme', fn ($p) => $p->whereIn('department_id', $departments)))->pluck('id')->all(),
             Employee::query()->whereIn('ulid', $validated['mentor_ids'])->pluck('id')->all(),
         );
 
@@ -69,6 +73,7 @@ class MentoringController extends Controller
     public function reassign(Request $request, Student $student): JsonResponse
     {
         Gate::authorize(P::Allocate);
+        abort_unless(DepartmentScope::allows($this->user($request), P::Allocate, $student->programme->department_id), 403);
         $validated = $request->validate(['mentor_id' => ['required', 'string', 'size:26'], 'reason' => ['nullable', 'string', 'max:300']]);
         $this->mentoring->reassign($student, Employee::query()->where('ulid', $validated['mentor_id'])->firstOrFail(), $validated['reason'] ?? null);
 
@@ -97,7 +102,9 @@ class MentoringController extends Controller
     {
         Gate::authorize(P::ReportsView);
         $section = $request->input('filter.section');
+        $departments = DepartmentScope::for($this->user($request), P::ReportsView);
         $students = Student::query()->with(['user', 'programme', 'section.batch'])->where('status', 'active')
+            ->when($departments !== null, fn ($q) => $q->inDepartments($departments))
             ->when($section, fn ($q, $ulid) => $q->whereHas('section', fn ($s) => $s->where('ulid', $ulid)))
             ->orderBy('section_id')->orderByRaw('roll_no is null, roll_no')->limit(400)->get();
         $flags = $this->mentoring->flags($students);

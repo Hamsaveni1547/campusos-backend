@@ -107,8 +107,14 @@ class AnnouncementController extends Controller
         $user = $this->user($request);
         abort_unless($user->canAny([P::AnnouncementsPublish, P::AnnouncementsPublishAll]), 403);
 
+        $limits = $this->announcements->limitsFor($user);
+
         return ApiResponse::data([
-            'types' => $user->can(P::AnnouncementsPublishAll) ? Announcement::AUDIENCES : Announcement::LIMITED_AUDIENCES,
+            'types' => $limits['types'],
+            'limits' => [
+                'departments' => $limits['departments'] === null ? null : Department::query()->whereIn('id', $limits['departments'])->pluck('ulid')->all(),
+                'sections' => $limits['sections'] === null ? null : Section::query()->whereIn('id', $limits['sections'])->pluck('ulid')->all(),
+            ],
             'roles' => collect(SystemRole::cases())->reject(fn (SystemRole $r) => $r === SystemRole::Applicant)->map(fn (SystemRole $r): array => ['value' => $r->value, 'label' => $r->displayName()])->values(),
             'categories' => collect(NotificationCategory::cases())->reject(fn (NotificationCategory $c) => in_array($c, [NotificationCategory::Security, NotificationCategory::Account, NotificationCategory::System], true))
                 ->map(fn (NotificationCategory $c): array => ['value' => $c->value, 'label' => $c->label()])->values(),
@@ -154,9 +160,9 @@ class AnnouncementController extends Controller
     public function publish(Request $request, Announcement $announcement): JsonResponse
     {
         abort_unless($this->canManage($this->user($request), $announcement), 403);
-        $this->announcements->publish($announcement);
+        $message = $this->announcements->publishOrSchedule($announcement);
 
-        return ApiResponse::data(['message' => "Sent to {$announcement->recipients_count} people.", 'recipients' => $announcement->recipients_count]);
+        return ApiResponse::data(['message' => $message, 'recipients' => $announcement->recipients_count, 'status' => $announcement->status]);
     }
 
     public function withdraw(Request $request, Announcement $announcement): JsonResponse
@@ -192,7 +198,7 @@ class AnnouncementController extends Controller
     private function validated(Request $request, User $user): array
     {
         abort_unless($user->canAny([P::AnnouncementsPublish, P::AnnouncementsPublishAll]), 403);
-        $types = $user->can(P::AnnouncementsPublishAll) ? Announcement::AUDIENCES : Announcement::LIMITED_AUDIENCES;
+        $types = $this->announcements->limitsFor($user)['types'];
 
         $data = $request->validate([
             'title' => ['required', 'string', 'max:200'],
@@ -205,6 +211,7 @@ class AnnouncementController extends Controller
             'is_pinned' => ['boolean'],
             'requires_ack' => ['boolean'],
             'expires_on' => ['nullable', 'date', 'after_or_equal:today'],
+            'publish_at' => ['nullable', 'date', 'after:now'],
         ]);
 
         $type = $data['audience_type'];
@@ -219,6 +226,8 @@ class AnnouncementController extends Controller
         if ($data['audience_ids'] === []) {
             throw new BusinessRuleException('Choose who should receive this announcement.', 'EMPTY_AUDIENCE', 422);
         }
+
+        $this->announcements->assertWithinLimits($user, $type, $data['audience_ids'] ?? []);
 
         return $data;
     }
@@ -243,6 +252,7 @@ class AnnouncementController extends Controller
             'requires_ack' => $a->requires_ack,
             'expires_on' => $a->expires_on?->toDateString(),
             'published_at' => $a->published_at?->toIso8601String(),
+            'publish_at' => $a->publish_at?->toIso8601String(),
             'from' => $a->author?->name,
             ...($forPublisher ? [
                 'status' => $a->status,

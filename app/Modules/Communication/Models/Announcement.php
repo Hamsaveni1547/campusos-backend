@@ -21,13 +21,14 @@ use Illuminate\Support\Carbon;
  * @property bool $is_pinned
  * @property bool $requires_ack
  * @property Carbon|null $expires_on
- * @property string $status draft|published|withdrawn
+ * @property string $status draft|scheduled|published|withdrawn
+ * @property Carbon|null $publish_at when a scheduled announcement goes out
  * @property Carbon|null $published_at
  * @property int $recipients_count
  * @property int|null $created_by
  * @property-read User|null $author
  */
-#[Fillable(['title', 'body', 'category', 'priority', 'audience_type', 'audience_ids', 'is_pinned', 'requires_ack', 'expires_on'])]
+#[Fillable(['title', 'body', 'category', 'priority', 'audience_type', 'audience_ids', 'is_pinned', 'requires_ack', 'expires_on', 'publish_at'])]
 class Announcement extends TenantModel
 {
     public const AUDIENCES = ['everyone', 'staff', 'students', 'roles', 'departments', 'programmes', 'batches', 'sections'];
@@ -41,7 +42,7 @@ class Announcement extends TenantModel
 
     protected function casts(): array
     {
-        return ['audience_ids' => 'array', 'is_pinned' => 'boolean', 'requires_ack' => 'boolean', 'expires_on' => 'date', 'published_at' => 'datetime'];
+        return ['audience_ids' => 'array', 'is_pinned' => 'boolean', 'requires_ack' => 'boolean', 'expires_on' => 'date', 'publish_at' => 'datetime', 'published_at' => 'datetime'];
     }
 
     /**

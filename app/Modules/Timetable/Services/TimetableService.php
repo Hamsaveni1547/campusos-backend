@@ -5,6 +5,7 @@ namespace App\Modules\Timetable\Services;
 use App\Models\User;
 use App\Modules\Academics\Models\FacultyAllocation;
 use App\Modules\Academics\Models\OfferingSection;
+use App\Modules\Communication\Services\CampusAlerts;
 use App\Modules\HR\Models\Employee;
 use App\Modules\Timetable\Models\TimeSlot;
 use App\Modules\Timetable\Models\Timetable;
@@ -136,6 +137,7 @@ class TimetableService
             'published_by' => $publisher->id,
             'published_at' => now(),
         ])->save();
+        app(CampusAlerts::class)->timetablePublished($timetable);
 
         return $timetable;
     }
