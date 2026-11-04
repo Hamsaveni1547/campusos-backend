@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Communication\Http\Controllers\AnnouncementController;
 use App\Modules\Communication\Http\Controllers\MyNotificationController;
 use App\Modules\Communication\Http\Controllers\NotificationTemplateController;
 use Illuminate\Support\Facades\Route;
@@ -20,4 +21,18 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::put('notification-templates/{key}/{channel}', [NotificationTemplateController::class, 'update'])->name('notification-templates.update');
     Route::delete('notification-templates/{key}/{channel}', [NotificationTemplateController::class, 'reset'])->name('notification-templates.reset');
     Route::get('notification-deliveries', [NotificationTemplateController::class, 'deliveries'])->name('notification-deliveries.index');
+});
+
+Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->group(function (): void {
+    Route::get('me/announcements', [AnnouncementController::class, 'feed'])->name('me.announcements');
+    Route::get('announcements/audiences', [AnnouncementController::class, 'audiences'])->name('announcements.audiences');
+    Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::put('announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    Route::post('announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])->name('announcements.publish');
+    Route::post('announcements/{announcement}/withdraw', [AnnouncementController::class, 'withdraw'])->name('announcements.withdraw');
+    Route::post('announcements/{announcement}/acknowledge', [AnnouncementController::class, 'acknowledge'])->name('announcements.acknowledge');
+    Route::get('announcements/{announcement}/read-stats', [AnnouncementController::class, 'readStats'])->name('announcements.read-stats');
 });

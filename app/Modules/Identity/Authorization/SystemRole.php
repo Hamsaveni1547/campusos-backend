@@ -95,21 +95,25 @@ enum SystemRole: string
                 'mentoring.*',
             ],
             self::Librarian => [
+                'communication.announcements.publish',
                 'library.*',
             ],
             self::FinanceOfficer => [
+                'communication.announcements.publish',
                 'students.records.view',
                 'hr.employees.view',
                 'finance.*',
                 'payroll.*',
             ],
             self::Examiner => [
+                'communication.announcements.publish',
                 'academics.catalogue.view',
                 'students.records.view',
                 'exams.*',
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'communication.announcements.publish_all',
                 'mentoring.reports.view',
                 'mentoring.notes.confidential',
                 'assets.reports.view',
@@ -148,8 +152,10 @@ enum SystemRole: string
                 'identity.role_assignments.view',
                 'hr.*',
                 'leave.*',
+                'communication.announcements.publish',
             ],
             self::Hod => [
+                'communication.announcements.publish',
                 'mentoring.allocate',
                 'mentoring.mentor',
                 'mentoring.reports.view',
@@ -187,6 +193,7 @@ enum SystemRole: string
                 'qbank.papers.review',
             ],
             self::Faculty => [
+                'communication.announcements.publish',
                 'mentoring.mentor',
                 'assets.rooms.book',
                 'exams.evaluation.enter',
@@ -201,6 +208,7 @@ enum SystemRole: string
                 'academics.materials.manage',
             ],
             self::AdminStaff => [
+                'communication.announcements.publish_all',
                 'identity.users.view',
                 'institution.batches.manage',
                 'institution.calendar.manage',

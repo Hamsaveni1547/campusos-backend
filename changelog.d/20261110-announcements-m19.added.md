@@ -1,0 +1,1 @@
+Add M19 announcements: drafts, audiences (everyone, staff, students, roles, departments, programmes, batches, sections), publishing with in-app and email notification, pinned and important notices, acknowledgement, read statistics and withdrawal. Teachers and office roles post to departments, programmes, batches and sections; the principal, admin and office post to anyone.

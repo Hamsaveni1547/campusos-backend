@@ -174,3 +174,25 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | Mentor–mentee messaging and parent communication log | Notes and meetings first; messaging belongs with M19/M20 | open |
 | HOD scoping of allocation and at-risk lists to their own department | Section filter first | open |
 | Counsellor role and referral workflow | Confidential-notes permission first | open |
+
+## M19 Communication (announcements)
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Scheduled publishing (publish at a future time) | Publish now first; needs the scheduler | open |
+| Attachments on announcements | Text first | open |
+| Strict scope: teachers only to their own sections, HODs only to their department | Limited audience types first | open |
+| Daily digest email, push and WebSockets | In-app and email first; polling is enough | open |
+| AI summaries of long circulars | Needs M21 | planned (M21) |
+| Mentor–mentee messaging, parent communication log (from M18) | Announcements first | open |
+
+## M20 Reports & analytics
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Excel/PDF exports and background export jobs | CSV of on-screen rows first; reports are small | open |
+| Saved filters and scheduled report emails | Catalogue first | open |
+| Trend analytics and snapshot tables (attendance, results, collections over years) | Live queries are fast enough at college scale | open |
+| Accreditation packs (NAAC, NBA CO-PO, NIRF, AISHE) | Needs CO attainment data from M05/M08 | open |
+| Department scoping of reports and dashboard for HODs | Permission-based access first | open |
+| AI insights on dashboards | Needs M21 | planned (M21) |

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Modules\Identity\Actions\Roles\SyncSystemPermissions;
 use Database\Seeders\Demo\AdmissionsSeeder;
+use Database\Seeders\Demo\AnnouncementSeeder;
 use Database\Seeders\Demo\AssessmentSeeder;
 use Database\Seeders\Demo\AssetSeeder;
 use Database\Seeders\Demo\AttendanceSeeder;
@@ -65,6 +66,7 @@ class DatabaseSeeder extends Seeder
             AssetSeeder::class,
             FeedbackSeeder::class,
             MentoringSeeder::class,
+            AnnouncementSeeder::class,
         ]);
 
         $this->command?->table(['Sign in as', 'Email'], [

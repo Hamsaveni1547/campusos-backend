@@ -4,6 +4,7 @@ namespace App\Modules\Communication;
 
 use App\Modules\Communication\Channels\CampusDatabaseChannel;
 use App\Modules\Communication\Listeners\RecordNotificationDelivery;
+use App\Modules\Communication\Notifications\AnnouncementNotification;
 use App\Modules\Communication\Support\NotificationPreferences;
 use App\Modules\Communication\Support\NotificationTemplateRegistry;
 use App\Modules\Communication\Support\TemplateRenderer;
@@ -24,8 +25,9 @@ class CommunicationServiceProvider extends ServiceProvider
         $this->app->bind(DatabaseChannel::class, CampusDatabaseChannel::class);
     }
 
-    public function boot(): void
+    public function boot(NotificationTemplateRegistry $templates): void
     {
+        $templates->register(AnnouncementNotification::class);
         Event::listen(NotificationSent::class, RecordNotificationDelivery::class);
         Event::listen(NotificationFailed::class, RecordNotificationDelivery::class);
     }
