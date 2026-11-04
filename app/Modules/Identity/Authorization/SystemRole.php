@@ -86,6 +86,11 @@ enum SystemRole: string
                 'assessment.*',
                 'exams.*',
                 'qbank.*',
+                'finance.*',
+            ],
+            self::FinanceOfficer => [
+                'students.records.view',
+                'finance.*',
             ],
             self::Examiner => [
                 'academics.catalogue.view',
@@ -94,6 +99,8 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'finance.reports.view',
+                'finance.concessions.approve',
                 'qbank.logs.view',
                 'exams.reports.view',
                 'exams.results.verify',
@@ -187,6 +194,8 @@ enum SystemRole: string
                 'assessment.reports.view',
                 'exams.cycles.manage',
                 'exams.reports.view',
+                'finance.payments.collect',
+                'finance.reports.view',
             ],
             default => [],
         };

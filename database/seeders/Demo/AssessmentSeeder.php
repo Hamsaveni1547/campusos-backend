@@ -58,7 +58,7 @@ class AssessmentSeeder extends CampusSeeder
             });
 
             foreach ($offering->sections as $sectionIndex => $class) {
-                $classTeacher = $class->allocations->first()?->employee?->user ?? $teacher;
+                $classTeacher = $class->allocations->first()?->employee->user ?? $teacher;
                 $roster = $assessment->roster($class);
 
                 $this->as($classTeacher, function () use ($assessment, $class, $roster, $ia1, $ia2, $classTeacher): void {

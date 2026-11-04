@@ -97,3 +97,16 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | Reopening a sealed paper by the board, with audit | Sealed papers are final for now | open |
 | Answer keys released to evaluators after the exam | Answers are hidden on release for now | open |
 | IP allow-list for release | Window and permission checks first | open |
+
+## M11 Fees
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Online payment gateway (UPI/cards/netbanking) with verified webhooks | External dependency; payments are recorded at the counter | open |
+| Refunds with approval and processing | Counter flow first | open |
+| Instalment plans and reminders | Needs notifications | open |
+| Late fee rules | Simple due dates first | open |
+| Bank/gateway reconciliation | Needs the gateway | open |
+| PDF receipts with QR | Printable web receipt first, no PDF library | open |
+| Admission and exam fees raised automatically from M03/M09 | Fees are raised from structures or as one-off charges for now | open |
+| Expenses | Optional in the plan | open |

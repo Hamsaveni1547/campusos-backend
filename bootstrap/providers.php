@@ -6,6 +6,7 @@ use App\Modules\Assessment\AssessmentServiceProvider;
 use App\Modules\Attendance\AttendanceServiceProvider;
 use App\Modules\Communication\CommunicationServiceProvider;
 use App\Modules\Exams\ExamsServiceProvider;
+use App\Modules\Finance\FinanceServiceProvider;
 use App\Modules\Identity\IdentityServiceProvider;
 use App\Modules\QuestionBank\QuestionBankServiceProvider;
 use App\Providers\AppServiceProvider;
@@ -22,4 +23,5 @@ return [
     AssessmentServiceProvider::class,
     ExamsServiceProvider::class,
     QuestionBankServiceProvider::class,
+    FinanceServiceProvider::class,
 ];

@@ -8,6 +8,7 @@ use Database\Seeders\Demo\AssessmentSeeder;
 use Database\Seeders\Demo\AttendanceSeeder;
 use Database\Seeders\Demo\CurriculumSeeder;
 use Database\Seeders\Demo\ExamSeeder;
+use Database\Seeders\Demo\FeeSeeder;
 use Database\Seeders\Demo\InstitutionSetupSeeder;
 use Database\Seeders\Demo\PastSemesterSeeder;
 use Database\Seeders\Demo\QuestionBankSeeder;
@@ -51,6 +52,7 @@ class DatabaseSeeder extends Seeder
             ExamSeeder::class,
             QuestionBankSeeder::class,
             AdmissionsSeeder::class,
+            FeeSeeder::class,
         ]);
 
         $this->command?->table(['Sign in as', 'Email'], [
@@ -60,7 +62,7 @@ class DatabaseSeeder extends Seeder
             ['HOD (cse, aids, ise, mca, mba)', 'hod.cse@'.CampusSeeder::DOMAIN],
             ['Faculty', 'kavya.shetty@'.CampusSeeder::DOMAIN],
             ['Office / admissions', 'office@ and admissions@'.CampusSeeder::DOMAIN],
-            ['HR / accounts / library', 'hr@, accounts@, library@'.CampusSeeder::DOMAIN],
+            ['HR / accounts (fees) / library', 'hr@, accounts@, library@'.CampusSeeder::DOMAIN],
             ['Student', 'student@'.CampusSeeder::DOMAIN],
             ['Applicant', 'applicant@'.CampusSeeder::DOMAIN],
             ['Platform admin', 'platform.admin@campusos.test'],

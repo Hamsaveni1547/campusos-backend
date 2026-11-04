@@ -6,6 +6,7 @@ use App\Modules\Assessment\Authorization\AssessmentPermissions;
 use App\Modules\Attendance\Authorization\AttendancePermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
 use App\Modules\Exams\Authorization\ExamPermissions;
+use App\Modules\Finance\Authorization\FinancePermissions;
 use App\Modules\HR\Authorization\HRPermissions;
 use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
@@ -131,6 +132,7 @@ return [
         AssessmentPermissions::class,
         ExamPermissions::class,
         QuestionBankPermissions::class,
+        FinancePermissions::class,
     ],
 
     /*

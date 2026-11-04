@@ -97,7 +97,7 @@ class PastSemesterSeeder extends CampusSeeder
 
             foreach ($offering->sections as $class) {
                 /** @var OfferingSection $class */
-                $classTeacher = $class->allocations->first()?->employee?->user ?? $teacher;
+                $classTeacher = $class->allocations->first()?->employee->user ?? $teacher;
                 $roster = $assessment->roster($class);
 
                 $this->as($classTeacher, function () use ($assessment, $tests, $class, $roster, $classTeacher): void {
