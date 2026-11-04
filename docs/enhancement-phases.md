@@ -31,7 +31,9 @@ Do this first, because several later items depend on it.
 | Daily digest email | M19 | Dropped (not needed for a demo). |
 | Scheduled report emails | M20 | Dropped (CSV download is enough). |
 
-## E2 — Imports, attachments and exports
+## E2 — Imports, attachments and exports — done 2026-11-04
+
+Built: marks sheet download and CSV upload on the marks screen (fills the grid, the teacher saves), library catalogue CSV import (on the shared Imports page), attachments on complaints and announcements (private, visible to whoever may see the record), a private timetable calendar feed for Google or phone calendars, and Excel-friendly CSV downloads. Dropped as not worth it for a demo: question and asset CSV imports, medical-certificate and maintenance-photo uploads, images in questions, saved report filters.
 
 | Item | From | Plan |
 |---|---|---|

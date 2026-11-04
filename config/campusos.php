@@ -16,6 +16,7 @@ use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
 use App\Modules\Leave\Authorization\LeavePermissions;
 use App\Modules\Library\Authorization\LibraryPermissions;
+use App\Modules\Library\Imports\LibraryBookImporter;
 use App\Modules\Mentoring\Authorization\MentoringPermissions;
 use App\Modules\Payroll\Authorization\PayrollPermissions;
 use App\Modules\QuestionBank\Authorization\QuestionBankPermissions;
@@ -185,6 +186,7 @@ return [
         'users' => UserImporter::class,
         'employees' => EmployeeImporter::class,
         'students' => StudentImporter::class,
+        'library_books' => LibraryBookImporter::class,
     ],
 
 ];

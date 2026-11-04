@@ -3,8 +3,10 @@
 namespace App\Modules\Communication\Models;
 
 use App\Models\User;
+use App\Modules\Communication\Policies\AnnouncementPolicy;
 use App\Shared\Models\TenantModel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -28,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $created_by
  * @property-read User|null $author
  */
+#[UsePolicy(AnnouncementPolicy::class)]
 #[Fillable(['title', 'body', 'category', 'priority', 'audience_type', 'audience_ids', 'is_pinned', 'requires_ack', 'expires_on', 'publish_at'])]
 class Announcement extends TenantModel
 {

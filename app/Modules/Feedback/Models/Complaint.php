@@ -3,8 +3,10 @@
 namespace App\Modules\Feedback\Models;
 
 use App\Models\User;
+use App\Modules\Feedback\Policies\ComplaintPolicy;
 use App\Shared\Models\TenantModel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -25,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property-read User|null $raiser
  * @property-read User|null $assignee
  */
+#[UsePolicy(ComplaintPolicy::class)]
 #[Fillable(['complaint_category_id', 'subject', 'description', 'is_anonymous'])]
 class Complaint extends TenantModel
 {

@@ -8,10 +8,12 @@ use App\Modules\Feedback\Models\Complaint;
 use App\Modules\Feedback\Models\ComplaintCategory;
 use App\Modules\Feedback\Models\ComplaintMessage;
 use App\Modules\Feedback\Services\FeedbackService;
+use App\Shared\Files\Attachments;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
@@ -82,6 +84,7 @@ class ComplaintController extends Controller
         return ApiResponse::data([
             ...$this->complaint($complaint->load(['category', 'raiser', 'assignee']), $staff),
             'can_handle' => $staff,
+            'attachments' => app(Attachments::class)->present($complaint),
             'messages' => $complaint->messages()->with('user')->when(! $staff, fn ($q) => $q->where('is_internal', false))->get()->map(fn (ComplaintMessage $m): array => [
                 'body' => $m->body, 'is_internal' => $m->is_internal, 'at' => $m->created_at->toIso8601String(),
                 'from' => $m->user_id === $complaint->created_by ? ($complaint->is_anonymous && $staff ? 'Complainant' : $m->user?->name) : $m->user?->name,
@@ -127,9 +130,14 @@ class ComplaintController extends Controller
      */
     public function raise(Request $request): JsonResponse
     {
-        $validated = $request->validate(['category_id' => ['required', 'string', 'size:26'], 'subject' => ['required', 'string', 'max:200'], 'description' => ['required', 'string', 'max:5000'], 'anonymous' => ['sometimes', 'boolean']]);
+        $validated = $request->validate(['category_id' => ['required', 'string', 'size:26'], 'subject' => ['required', 'string', 'max:200'], 'description' => ['required', 'string', 'max:5000'], 'anonymous' => ['sometimes', 'boolean'], 'attachment_ids' => ['sometimes', 'array', 'max:'.Attachments::MAX], 'attachment_ids.*' => ['string', 'size:26']]);
         $category = ComplaintCategory::query()->where('ulid', $validated['category_id'])->where('status', 'active')->firstOrFail();
-        $complaint = $this->feedback->raise($category, $validated['subject'], $validated['description'], (bool) ($validated['anonymous'] ?? false));
+        $complaint = DB::transaction(function () use ($category, $validated, $request): Complaint {
+            $complaint = $this->feedback->raise($category, $validated['subject'], $validated['description'], (bool) ($validated['anonymous'] ?? false));
+            app(Attachments::class)->attach($validated['attachment_ids'] ?? [], $complaint, $this->user($request));
+
+            return $complaint;
+        });
 
         return ApiResponse::data(['id' => $complaint->ulid], 201);
     }

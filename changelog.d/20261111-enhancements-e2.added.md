@@ -1,0 +1,1 @@
+﻿E2: attachments on complaints and announcements (private, policy-checked), library catalogue CSV import (`library_books`), and a private timetable calendar feed (iCalendar) for Google and phone calendars.

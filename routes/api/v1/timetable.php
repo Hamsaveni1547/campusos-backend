@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Timetable\Http\Controllers\CalendarFeedController;
 use App\Modules\Timetable\Http\Controllers\ScheduleController;
 use App\Modules\Timetable\Http\Controllers\SlotTemplateController;
 use App\Modules\Timetable\Http\Controllers\TimetableController;
@@ -29,3 +30,6 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::post('timetable-adjustments/extra', [ScheduleController::class, 'extra'])->name('timetable-adjustments.extra');
     Route::delete('timetable-adjustments/{timetableAdjustment}', [ScheduleController::class, 'undo'])->name('timetable-adjustments.destroy');
 });
+
+Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->get('me/timetable/calendar-link', [CalendarFeedController::class, 'link'])->name('me.timetable.calendar-link');
+Route::middleware(['signed', 'throttle:60,1'])->get('calendar/{campus}/{member}/timetable.ics', [CalendarFeedController::class, 'feed'])->name('timetable.ics');

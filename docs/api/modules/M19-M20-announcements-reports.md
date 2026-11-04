@@ -56,3 +56,9 @@ Errors: `NOT_DRAFT`, `NOT_PUBLISHED`, `EMPTY_AUDIENCE`, `NO_ACK_NEEDED`.
 | POST | `me/online-payments/{id}/complete` | `method` upi\|card\|netbanking, `outcome` success\|failure. A success records a normal fee receipt |
 
 Errors: `NOTHING_DUE`, `OVERPAYMENT`, `ALREADY_COMPLETED`.
+
+## E2 additions
+
+- **Attachments:** upload with `POST files` (`purpose=attachment`), then pass `attachment_ids[]` (up to 5) when raising a complaint (`POST me/complaints`) or saving an announcement. The complaint and announcement responses include `attachments[]` (`id`, `name`, `mime_type`, `size_bytes`). A file can be downloaded by anyone who may see its complaint or announcement. Errors: `FILE_INVALID`, `TOO_MANY_FILES`.
+- **Library import:** import type `library_books` on the shared imports API. Columns: `title`, `authors`; optional `isbn`, `publisher`, `edition`, `published_year`, `subject`, `call_number`, `accession_nos` (separated by `;`), `shelf`. A row whose ISBN already exists adds copies to that book.
+- **Timetable calendar:** `GET me/timetable/calendar-link` returns a private signed URL to `calendar/{campus}/{member}/timetable.ics` (iCalendar, weekly repeats for the current term).

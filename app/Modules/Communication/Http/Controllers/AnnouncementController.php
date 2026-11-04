@@ -14,11 +14,13 @@ use App\Modules\Institution\Models\Department;
 use App\Modules\Institution\Models\Programme;
 use App\Modules\Institution\Models\Section;
 use App\Shared\Exceptions\BusinessRuleException;
+use App\Shared\Files\Attachments;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -64,7 +66,15 @@ class AnnouncementController extends Controller
             $recipient->forceFill(['read_at' => now()])->save();
         }
 
-        return ApiResponse::data([...$this->present($announcement, $isPublisher), 'read_at' => $recipient?->read_at?->toIso8601String(), 'acknowledged_at' => $recipient?->acknowledged_at?->toIso8601String(), 'can_manage' => $isPublisher]);
+        return ApiResponse::data([...$this->present($announcement, $isPublisher), 'read_at' => $recipient?->read_at?->toIso8601String(), 'acknowledged_at' => $recipient?->acknowledged_at?->toIso8601String(), 'can_manage' => $isPublisher, 'attachments' => app(Attachments::class)->present($announcement)]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function attachmentIds(Request $request): array
+    {
+        return array_values($request->validate(['attachment_ids' => ['sometimes', 'array', 'max:'.Attachments::MAX], 'attachment_ids.*' => ['string', 'size:26']])['attachment_ids'] ?? []);
     }
 
     public function acknowledge(Request $request, Announcement $announcement): JsonResponse
@@ -124,8 +134,14 @@ class AnnouncementController extends Controller
     public function store(Request $request): JsonResponse
     {
         $user = $this->user($request);
-        $announcement = new Announcement($this->validated($request, $user));
-        $announcement->save();
+        $data = $this->validated($request, $user);
+        $announcement = DB::transaction(function () use ($data, $request, $user): Announcement {
+            $announcement = new Announcement($data);
+            $announcement->save();
+            app(Attachments::class)->attach($this->attachmentIds($request), $announcement, $user);
+
+            return $announcement;
+        });
 
         return ApiResponse::data($this->present($announcement->refresh(), true), 201);
     }
@@ -139,7 +155,11 @@ class AnnouncementController extends Controller
             throw new BusinessRuleException('A published announcement cannot be edited. Withdraw it and post a new one.', 'NOT_DRAFT', 422);
         }
 
-        $announcement->update($this->validated($request, $user));
+        $data = $this->validated($request, $user);
+        DB::transaction(function () use ($announcement, $data, $request, $user): void {
+            $announcement->update($data);
+            app(Attachments::class)->attach($this->attachmentIds($request), $announcement, $user);
+        });
 
         return ApiResponse::data($this->present($announcement, true));
     }
