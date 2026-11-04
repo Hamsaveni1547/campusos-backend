@@ -5,9 +5,11 @@ namespace Database\Seeders;
 use App\Modules\Identity\Actions\Roles\SyncSystemPermissions;
 use Database\Seeders\Demo\AdmissionsSeeder;
 use Database\Seeders\Demo\AssessmentSeeder;
+use Database\Seeders\Demo\AssetSeeder;
 use Database\Seeders\Demo\AttendanceSeeder;
 use Database\Seeders\Demo\CurriculumSeeder;
 use Database\Seeders\Demo\ExamSeeder;
+use Database\Seeders\Demo\FeedbackSeeder;
 use Database\Seeders\Demo\FeeSeeder;
 use Database\Seeders\Demo\InstitutionSetupSeeder;
 use Database\Seeders\Demo\LeaveSeeder;
@@ -59,6 +61,8 @@ class DatabaseSeeder extends Seeder
             LeaveSeeder::class,
             PayrollSeeder::class,
             LibrarySeeder::class,
+            AssetSeeder::class,
+            FeedbackSeeder::class,
         ]);
 
         $this->command?->table(['Sign in as', 'Email'], [

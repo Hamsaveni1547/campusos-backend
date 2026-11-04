@@ -143,3 +143,25 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | Barcode labels and scanner-friendly screens | Accession numbers are typed for now | open |
 | Digital library and institutional repository | Plan phases it later | open |
 | Acquisitions, vendors and periodicals | Plan phases it later | open |
+
+## M16 Labs & assets
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Consumables stock with reorder alerts | Asset register first | open |
+| Equipment issue to students / projects (lab no-dues) | Register and maintenance first | open |
+| Preventive maintenance schedules | Fault reporting first | open |
+| Annual stock verification and condemnation workflow | Status can be set to condemned by hand | open |
+| Depreciation and asset import | Plan phases it later | open |
+| Photos on maintenance requests | Text description first | open |
+
+## M17 Feedback & complaints
+
+| Item | Why deferred | Status |
+|---|---|---|
+| NLP: sentiment, topic clustering, complaint auto-categorisation, summaries | Needs M21 (user, 2026-11-07) | planned (M21) |
+| Course-end survey feeding indirect CO attainment (M05/M08) | Surveys first | open |
+| Alumni, employer and parent surveys | Students and staff first | open |
+| Mandatory feedback before hall tickets | Configurable rule later | open |
+| Complaint escalation chain and auto-routing to departments | SLA overdue flag and manual assignment first | open |
+| Attachments on complaints | Text first | open |

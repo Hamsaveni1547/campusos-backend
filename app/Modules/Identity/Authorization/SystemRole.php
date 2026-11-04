@@ -90,6 +90,8 @@ enum SystemRole: string
                 'payroll.*',
                 'leave.*',
                 'library.*',
+                'assets.*',
+                'feedback.*',
             ],
             self::Librarian => [
                 'library.*',
@@ -107,6 +109,8 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'assets.reports.view',
+                'feedback.*',
                 'leave.approve',
                 'leave.reports.view',
                 'library.reports.view',
@@ -143,6 +147,10 @@ enum SystemRole: string
                 'leave.*',
             ],
             self::Hod => [
+                'assets.reports.view',
+                'assets.rooms.book',
+                'feedback.results.view',
+                'feedback.complaints.handle',
                 'leave.approve',
                 'leave.reports.view',
                 'hr.employees.view',
@@ -173,6 +181,7 @@ enum SystemRole: string
                 'qbank.papers.review',
             ],
             self::Faculty => [
+                'assets.rooms.book',
                 'exams.evaluation.enter',
                 'qbank.questions.contribute',
                 'qbank.papers.set',
@@ -210,6 +219,11 @@ enum SystemRole: string
                 'assessment.reports.view',
                 'exams.cycles.manage',
                 'exams.reports.view',
+                'assets.manage',
+                'assets.maintenance.manage',
+                'assets.reports.view',
+                'assets.rooms.book',
+                'feedback.complaints.handle',
                 'finance.payments.collect',
                 'finance.reports.view',
             ],

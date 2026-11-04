@@ -3,9 +3,11 @@
 use App\Modules\Academics\Authorization\AcademicsPermissions;
 use App\Modules\Admissions\Authorization\AdmissionsPermissions;
 use App\Modules\Assessment\Authorization\AssessmentPermissions;
+use App\Modules\Assets\Authorization\AssetPermissions;
 use App\Modules\Attendance\Authorization\AttendancePermissions;
 use App\Modules\Communication\Authorization\CommunicationPermissions;
 use App\Modules\Exams\Authorization\ExamPermissions;
+use App\Modules\Feedback\Authorization\FeedbackPermissions;
 use App\Modules\Finance\Authorization\FinancePermissions;
 use App\Modules\HR\Authorization\HRPermissions;
 use App\Modules\HR\Imports\EmployeeImporter;
@@ -139,6 +141,8 @@ return [
         PayrollPermissions::class,
         LeavePermissions::class,
         LibraryPermissions::class,
+        AssetPermissions::class,
+        FeedbackPermissions::class,
     ],
 
     /*
