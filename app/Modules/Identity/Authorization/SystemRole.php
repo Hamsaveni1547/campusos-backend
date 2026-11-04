@@ -87,10 +87,13 @@ enum SystemRole: string
                 'exams.*',
                 'qbank.*',
                 'finance.*',
+                'payroll.*',
             ],
             self::FinanceOfficer => [
                 'students.records.view',
+                'hr.employees.view',
                 'finance.*',
+                'payroll.*',
             ],
             self::Examiner => [
                 'academics.catalogue.view',
@@ -99,6 +102,8 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'payroll.runs.approve',
+                'payroll.reports.view',
                 'finance.reports.view',
                 'finance.concessions.approve',
                 'qbank.logs.view',

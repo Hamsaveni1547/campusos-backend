@@ -12,6 +12,7 @@ use App\Modules\HR\Imports\EmployeeImporter;
 use App\Modules\Identity\Authorization\IdentityPermissions;
 use App\Modules\Identity\Imports\UserImporter;
 use App\Modules\Institution\Authorization\InstitutionPermissions;
+use App\Modules\Payroll\Authorization\PayrollPermissions;
 use App\Modules\QuestionBank\Authorization\QuestionBankPermissions;
 use App\Modules\Students\Authorization\StudentsPermissions;
 use App\Modules\Students\Imports\StudentImporter;
@@ -133,6 +134,7 @@ return [
         ExamPermissions::class,
         QuestionBankPermissions::class,
         FinancePermissions::class,
+        PayrollPermissions::class,
     ],
 
     /*

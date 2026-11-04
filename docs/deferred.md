@@ -110,3 +110,15 @@ Last review (2026-11-02): only items with no dependency on a future module and n
 | PDF receipts with QR | Printable web receipt first, no PDF library | open |
 | Admission and exam fees raised automatically from M03/M09 | Fees are raised from structures or as one-off charges for now | open |
 | Expenses | Optional in the plan | open |
+
+## M13 Payroll
+
+| Item | Why deferred | Status |
+|---|---|---|
+| Income tax (TDS) with old/new regime and investment declarations, Form 16 | Statutory detail; enter TDS as a monthly deduction for now | open |
+| ESI, PF and PT challan reports | Payroll register first | open |
+| Loans and advances with EMI schedules | One-off deductions cover recoveries for now | open |
+| Bank transfer (NEFT bulk) file | Needs bank details on staff records | open |
+| LOP taken automatically from leave and attendance | Needs M14 Leave | planned (M14) |
+| Salary revisions with effective dates and arrears | Salaries are replaced; arrears go in as one-off earnings | open |
+| PDF / emailed payslips | Printable web payslip first | open |

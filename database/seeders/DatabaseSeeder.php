@@ -11,6 +11,7 @@ use Database\Seeders\Demo\ExamSeeder;
 use Database\Seeders\Demo\FeeSeeder;
 use Database\Seeders\Demo\InstitutionSetupSeeder;
 use Database\Seeders\Demo\PastSemesterSeeder;
+use Database\Seeders\Demo\PayrollSeeder;
 use Database\Seeders\Demo\QuestionBankSeeder;
 use Database\Seeders\Demo\RegistrationSeeder;
 use Database\Seeders\Demo\StaffSeeder;
@@ -53,6 +54,7 @@ class DatabaseSeeder extends Seeder
             QuestionBankSeeder::class,
             AdmissionsSeeder::class,
             FeeSeeder::class,
+            PayrollSeeder::class,
         ]);
 
         $this->command?->table(['Sign in as', 'Email'], [
