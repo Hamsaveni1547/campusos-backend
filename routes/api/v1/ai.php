@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\AI\Http\Controllers\AiFeatureController;
+use App\Modules\AI\Http\Controllers\AiModelsController;
 use App\Modules\AI\Http\Controllers\AiUsageController;
 use App\Modules\AI\Http\Controllers\AssistantController;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready', 'throttle:30,1'])->prefix('ai')->name('ai.')->group(function (): void {
     Route::get('status', [AiFeatureController::class, 'status'])->name('status');
     Route::get('usage', AiUsageController::class)->name('usage');
+    Route::get('models', [AiModelsController::class, 'index'])->name('models');
+    Route::post('models/test', [AiModelsController::class, 'test'])->name('models.test');
 
     // A1: helpers on existing screens
     Route::post('announcements/draft', [AiFeatureController::class, 'draftAnnouncement'])->name('announcements.draft');

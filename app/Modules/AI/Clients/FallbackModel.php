@@ -37,16 +37,17 @@ class FallbackModel implements LanguageModel
      */
     private function first(callable $call): ModelReply
     {
-        $last = null;
+        $errors = [];
 
         foreach ($this->models as $model) {
             try {
                 return $call($model);
             } catch (AiUnavailable $e) {
-                $last = $e;
+                // Keep each provider's reason (with the network cause) so the log shows why every one failed.
+                $errors[] = $model->provider().': '.$e->getMessage().($e->getPrevious() ? ' ('.$e->getPrevious()->getMessage().')' : '');
             }
         }
 
-        throw $last ?? new AiUnavailable('No AI provider is configured.');
+        throw new AiUnavailable($errors === [] ? 'No AI provider is configured.' : implode(' | ', $errors));
     }
 }
