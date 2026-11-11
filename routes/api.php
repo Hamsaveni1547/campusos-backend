@@ -34,4 +34,5 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     require __DIR__.'/api/v1/feedback.php';
     require __DIR__.'/api/v1/mentoring.php';
     require __DIR__.'/api/v1/reports.php';
+    require __DIR__.'/api/v1/ai.php';
 });

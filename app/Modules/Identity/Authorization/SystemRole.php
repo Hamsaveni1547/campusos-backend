@@ -73,6 +73,7 @@ enum SystemRole: string
     {
         return match ($this) {
             self::InstitutionAdmin => [
+                'ai.*',
                 'identity.*',
                 'institution.*',
                 'communication.*',
@@ -95,10 +96,12 @@ enum SystemRole: string
                 'mentoring.*',
             ],
             self::Librarian => [
+                'ai.assistant.use',
                 'communication.announcements.publish',
                 'library.*',
             ],
             self::FinanceOfficer => [
+                'ai.assistant.use',
                 'communication.announcements.publish',
                 'students.records.view',
                 'hr.employees.view',
@@ -106,6 +109,7 @@ enum SystemRole: string
                 'payroll.*',
             ],
             self::Examiner => [
+                'ai.assistant.use',
                 'communication.announcements.publish',
                 'academics.catalogue.view',
                 'students.records.view',
@@ -121,6 +125,8 @@ enum SystemRole: string
                 'qbank.*',
             ],
             self::InstitutionHead => [
+                'ai.assistant.use',
+                'ai.usage.view',
                 'communication.announcements.publish_all',
                 'exams.cycles.approve',
                 'mentoring.reports.view',
@@ -154,6 +160,7 @@ enum SystemRole: string
                 'hr.employees.view',
             ],
             self::HrOfficer => [
+                'ai.assistant.use',
                 'identity.users.view',
                 'identity.users.create',
                 'identity.users.update',
@@ -165,6 +172,7 @@ enum SystemRole: string
                 'communication.announcements.publish',
             ],
             self::Hod => [
+                'ai.assistant.use',
                 'communication.announcements.publish',
                 'mentoring.allocate',
                 'mentoring.mentor',
@@ -201,6 +209,7 @@ enum SystemRole: string
                 'qbank.papers.view',
             ],
             self::Faculty => [
+                'ai.assistant.use',
                 'communication.announcements.publish',
                 'mentoring.mentor',
                 'assets.rooms.book',
@@ -215,6 +224,7 @@ enum SystemRole: string
                 'academics.materials.manage',
             ],
             self::AdminStaff => [
+                'ai.assistant.use',
                 'communication.announcements.publish_all',
                 'identity.users.view',
                 'institution.batches.manage',
@@ -248,6 +258,9 @@ enum SystemRole: string
                 'feedback.complaints.handle',
                 'finance.payments.collect',
                 'finance.reports.view',
+            ],
+            self::Student, self::Staff => [
+                'ai.assistant.use',
             ],
             default => [],
         };

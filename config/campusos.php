@@ -2,6 +2,7 @@
 
 use App\Modules\Academics\Authorization\AcademicsPermissions;
 use App\Modules\Admissions\Authorization\AdmissionsPermissions;
+use App\Modules\AI\Authorization\AIPermissions;
 use App\Modules\Assessment\Authorization\AssessmentPermissions;
 use App\Modules\Assets\Authorization\AssetPermissions;
 use App\Modules\Attendance\Authorization\AttendancePermissions;
@@ -154,6 +155,7 @@ return [
         AssetPermissions::class,
         FeedbackPermissions::class,
         MentoringPermissions::class,
+        AIPermissions::class,
     ],
 
     /*

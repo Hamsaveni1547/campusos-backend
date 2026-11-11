@@ -36,6 +36,7 @@ class ModuleAccess
         'assets' => ['Labs & assets', 'Asset register, room bookings and repair requests'],
         'feedback' => ['Feedback & complaints', 'Surveys and grievance redressal'],
         'mentoring' => ['Mentoring', 'Mentor allocation, mentee notes, concerns and meetings'],
+        'ai' => ['AI assistant', 'Chat assistant, announcement writer, complaint triage, feedback insights, document reading'],
     ];
 
     /** @var array<string, string>|null permission name => module */
