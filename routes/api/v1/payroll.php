@@ -19,6 +19,7 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::post('payroll-runs/{run}/{action}', [PayrollController::class, 'transition'])->whereIn('action', ['compute', 'approve', 'finalize'])->name('payroll-runs.transition');
 
     Route::get('payslips/{payslip}', [PayrollController::class, 'payslipShow'])->name('payslips.show');
+    Route::get('payslips/{payslip}/pdf', [PayrollController::class, 'payslipPdf'])->name('payslips.pdf');
     Route::put('payslips/{payslip}/inputs', [PayrollController::class, 'saveInputs'])->name('payslips.inputs');
     Route::get('me/payslips', [PayrollController::class, 'mine'])->name('me.payslips');
 });

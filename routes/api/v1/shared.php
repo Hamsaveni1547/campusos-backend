@@ -1,5 +1,6 @@
 <?php
 
+use App\Shared\Documents\VerifyDocumentController;
 use App\Shared\Files\FileController;
 use App\Shared\Imports\ImportController;
 use Illuminate\Support\Facades\Route;
@@ -23,3 +24,5 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::post('imports/{import}/commit', [ImportController::class, 'commit'])->name('imports.commit');
     Route::post('imports/{import}/cancel', [ImportController::class, 'cancel'])->name('imports.cancel');
 });
+
+Route::middleware('throttle:30,1')->get('verify/{code}', VerifyDocumentController::class)->name('documents.verify');

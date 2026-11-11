@@ -36,6 +36,8 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('me/exams', [MyExamController::class, 'index'])->name('me.exams');
     Route::post('me/exam-cycles/{cycle}/backlogs', [MyExamController::class, 'registerBacklogs'])->name('me.exams.backlogs');
     Route::get('me/hall-ticket/{cycle}', [MyExamController::class, 'hallTicket'])->name('me.hall-ticket');
+    Route::get('me/hall-ticket/{cycle}/pdf', [MyExamController::class, 'hallTicketPdf'])->name('me.hall-ticket.pdf');
+    Route::get('me/grade-card/{cycle}/pdf', [MyExamController::class, 'gradeCardPdf'])->name('me.grade-card.pdf');
     Route::get('me/results', [MyExamController::class, 'results'])->name('me.results');
     Route::post('me/revaluation-requests', [MyExamController::class, 'requestRevaluation'])->name('me.revaluation-requests.store');
 });

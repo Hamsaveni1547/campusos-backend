@@ -12,14 +12,17 @@ use App\Modules\Payroll\Models\PayrollRun;
 use App\Modules\Payroll\Models\Payslip;
 use App\Modules\Payroll\Services\PayrollService;
 use App\Modules\Payroll\Support\PayrollCalculator;
+use App\Shared\Documents\DocumentPdf;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Tenancy\CurrentInstitution;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags Payroll
@@ -232,6 +235,18 @@ class PayrollController extends Controller
         abort_unless($own || $user->can(P::ReportsView), 403);
 
         return ApiResponse::data([...$this->payslip($payslip), 'run' => $this->run($payslip->run), 'designation' => $payslip->employee->designation?->name]);
+    }
+
+    /**
+     * The payslip as a PDF with a verification code (same access as the payslip).
+     */
+    public function payslipPdf(Request $request, Payslip $payslip, DocumentPdf $pdf): Response
+    {
+        $p = $this->payslipShow($request, $payslip)->getData(true)['data'];
+        $period = Carbon::parse($p['run']['month'].(strlen((string) $p['run']['month']) === 7 ? '-01' : ''))->format('F Y');
+
+        return $pdf->download('payslip', $payslip->ulid, 'Payslip for '.$period, (string) $p['employee']['name'], 'pdf.payslip', ['p' => $p, 'period' => $period],
+            ['Employee code' => $p['employee']['code'], 'Pay period' => $period, 'Net pay' => 'Rs. '.number_format((float) $p['net'], 2)], 'payslip-'.$p['employee']['code'].'-'.$period);
     }
 
     /**

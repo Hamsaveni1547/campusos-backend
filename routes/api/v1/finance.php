@@ -27,6 +27,7 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('fee-payments', [FinanceController::class, 'payments'])->name('fee-payments.index');
     Route::post('fee-payments', [FinanceController::class, 'collect'])->name('fee-payments.store');
     Route::get('fee-payments/{payment}', [FinanceController::class, 'receiptShow'])->name('fee-payments.show');
+    Route::get('fee-payments/{payment}/pdf', [FinanceController::class, 'receiptPdf'])->name('fee-payments.pdf');
     Route::post('fee-payments/{payment}/cancel', [FinanceController::class, 'cancelPayment'])->name('fee-payments.cancel');
 
     Route::get('students/{student}/fee-account', [FinanceController::class, 'account'])->name('students.fee-account');

@@ -14,6 +14,7 @@ use App\Modules\Finance\Services\FinanceService;
 use App\Modules\Institution\Models\Programme;
 use App\Modules\Institution\Models\Term;
 use App\Modules\Students\Models\Student;
+use App\Shared\Documents\DocumentPdf;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Tenancy\CurrentInstitution;
@@ -23,6 +24,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags Fees
@@ -293,6 +295,17 @@ class FinanceController extends Controller
         abort_unless($own || $user->can(P::ReportsView), 403);
 
         return ApiResponse::data($this->receipt($payment));
+    }
+
+    /**
+     * The receipt as a PDF with a verification code (same access as the receipt).
+     */
+    public function receiptPdf(Request $request, FeePayment $payment, DocumentPdf $pdf): Response
+    {
+        $r = $this->receiptShow($request, $payment)->getData(true)['data'];
+
+        return $pdf->download('receipt', $payment->ulid, 'Fee receipt', (string) $r['student']['name'], 'pdf.receipt', ['r' => $r],
+            ['Receipt no.' => $r['receipt_no'], 'Amount' => 'Rs. '.number_format((float) $r['amount'], 2), 'Paid on' => $r['paid_on'], 'Status' => $r['status']], 'receipt-'.$r['receipt_no']);
     }
 
     public function cancelPayment(Request $request, FeePayment $payment): JsonResponse

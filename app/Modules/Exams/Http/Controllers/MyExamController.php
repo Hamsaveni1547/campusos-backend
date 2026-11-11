@@ -14,11 +14,13 @@ use App\Modules\Exams\Models\RevaluationRequest;
 use App\Modules\Exams\Services\ExamService;
 use App\Modules\Students\Authorization\StudentsPermissions;
 use App\Modules\Students\Models\Student;
+use App\Shared\Documents\DocumentPdf;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags Examinations (students)
@@ -106,6 +108,32 @@ class MyExamController extends Controller
     public function results(Request $request): JsonResponse
     {
         return $this->history($this->student($request));
+    }
+
+    /**
+     * My hall ticket for a cycle as a PDF.
+     */
+    public function hallTicketPdf(Request $request, ExamCycle $cycle, DocumentPdf $pdf): Response
+    {
+        $t = $this->hallTicket($request, $cycle)->getData(true)['data'];
+
+        return $pdf->download('hall_ticket', $cycle->ulid.':'.$t['student']['register_no'], 'Hall ticket — '.$t['cycle']['name'], (string) $t['student']['name'], 'pdf.hall-ticket', ['t' => $t],
+            ['Register no.' => $t['student']['register_no'], 'Examination' => $t['cycle']['name'], 'Courses' => count($t['exams'])], 'hall-ticket-'.$t['student']['register_no']);
+    }
+
+    /**
+     * My grade card for one published exam cycle as a PDF.
+     */
+    public function gradeCardPdf(Request $request, ExamCycle $cycle, DocumentPdf $pdf): Response
+    {
+        $student = $this->student($request)->load(['user', 'programme']);
+        $history = $this->history($student)->getData(true)['data'];
+        $result = collect($history['results'])->firstWhere('cycle.id', $cycle->ulid) ?? abort(404, 'No published result for this exam.');
+        $title = 'Grade card'.($result['semester'] ? ' — Semester '.$result['semester'] : '');
+
+        return $pdf->download('grade_card', $cycle->ulid.':'.$student->register_no, $title, $student->user->name, 'pdf.grade-card',
+            ['result' => $result, 'backlogs' => $history['backlogs'], 'student' => ['name' => $student->user->name, 'register_no' => $student->register_no, 'programme' => $student->programme->name]],
+            ['Register no.' => $student->register_no, 'Examination' => $result['cycle']['name'], 'SGPA' => $result['sgpa'], 'CGPA' => $result['cgpa']], 'grade-card-'.$student->register_no.'-'.$result['cycle']['name']);
     }
 
     /**
