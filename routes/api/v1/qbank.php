@@ -7,6 +7,7 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('qbank/options', [QuestionBankController::class, 'options'])->name('qbank.options');
 
     // Questions
+    Route::get('qbank/courses', [QuestionBankController::class, 'courses'])->name('qbank.courses');
     Route::get('courses/{course}/questions', [QuestionBankController::class, 'questions'])->name('questions.index');
     Route::post('courses/{course}/questions', [QuestionBankController::class, 'storeQuestion'])->name('questions.store');
     Route::get('courses/{course}/question-coverage', [QuestionBankController::class, 'coverage'])->name('questions.coverage');

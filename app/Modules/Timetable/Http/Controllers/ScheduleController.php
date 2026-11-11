@@ -15,6 +15,7 @@ use App\Modules\Timetable\Models\Timetable;
 use App\Modules\Timetable\Models\TimetableAdjustment;
 use App\Modules\Timetable\Models\TimetableEntry;
 use App\Modules\Timetable\Services\TimetableService;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -39,6 +40,7 @@ class ScheduleController extends Controller
     {
         Gate::authorize(TimetablePermissions::View);
         [$by, $id] = $this->target($request);
+        $this->assertInDepartment($request, $by, $id);
 
         return ApiResponse::data($this->weekFor($by, $id, $this->term($request->input('filter.term'))));
     }
@@ -51,6 +53,7 @@ class ScheduleController extends Controller
         Gate::authorize(TimetablePermissions::View);
         $request->validate(['date' => ['sometimes', 'date']]);
         [$by, $id] = $this->target($request);
+        $this->assertInDepartment($request, $by, $id);
         $date = Carbon::parse($request->input('date', now()->toDateString()));
 
         return ApiResponse::data(['date' => $date->toDateString(), 'periods' => $this->timetables->day($date, $by, $id, $this->term(null)?->id)]);
@@ -215,6 +218,26 @@ class ScheduleController extends Controller
         }
 
         throw new BusinessRuleException('Choose a section, teacher or room.', 'TARGET_REQUIRED', 422);
+    }
+
+    /**
+     * HOD and faculty see timetables of their own department only (sections and teachers; rooms are shared).
+     */
+    private function assertInDepartment(Request $request, string $by, int $id): void
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $departments = DepartmentScope::for($user, [TimetablePermissions::View, TimetablePermissions::Manage], homeDepartment: true);
+
+        if ($departments === null || $by === 'room') {
+            return;
+        }
+
+        $department = $by === 'section'
+            ? Section::query()->whereKey($id)->with('batch.programme')->first()?->batch->programme->department_id
+            : Employee::query()->whereKey($id)->value('department_id');
+
+        abort_unless(in_array($department, $departments, true), 403, 'You can only view timetables of your own department.');
     }
 
     private function term(?string $ulid): ?Term

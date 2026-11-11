@@ -11,6 +11,7 @@ use App\Modules\HR\Http\EmployeePresenter;
 use App\Modules\HR\Models\Employee;
 use App\Modules\HR\Models\EmployeeQualification;
 use App\Modules\HR\Services\EmployeeService;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Files\StoredFile;
 use App\Shared\Http\ApiResponse;
@@ -44,6 +45,7 @@ class EmployeeController extends Controller
             ->select('employees.*')
             ->join('users', 'users.id', '=', 'employees.user_id')
             ->with(['user', 'department', 'designation'])
+            ->when(DepartmentScope::for($request->user(), HRPermissions::EmployeesView), fn ($query, $departments) => $query->whereIn('employees.department_id', $departments))
             ->when($request->input('filter.search'), fn ($query, $search) => $query->where(fn ($query) => $query
                 ->where('users.name', 'like', "%{$search}%")
                 ->orWhere('users.email', 'like', "%{$search}%")

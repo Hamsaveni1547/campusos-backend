@@ -15,6 +15,7 @@ use App\Modules\Timetable\Models\TimeSlot;
 use App\Modules\Timetable\Models\Timetable;
 use App\Modules\Timetable\Models\TimetableEntry;
 use App\Modules\Timetable\Services\TimetableService;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -40,8 +41,10 @@ class TimetableController extends Controller
     {
         Gate::authorize(TimetablePermissions::View);
         $term = $this->term($request->input('filter.term'));
+        $departments = DepartmentScope::for($request->user(), [TimetablePermissions::View, TimetablePermissions::Manage], homeDepartment: true);
 
         $timetables = Timetable::query()
+            ->when($departments !== null, fn ($query) => $query->whereHas('section.batch.programme', fn ($query) => $query->whereIn('department_id', $departments)))
             ->with(['section.batch', 'template', 'term', 'publisher'])
             ->withCount('entries')
             ->where('term_id', $term->id ?? 0)

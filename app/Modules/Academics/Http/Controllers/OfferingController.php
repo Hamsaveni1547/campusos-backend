@@ -15,6 +15,7 @@ use App\Modules\HR\Models\Employee;
 use App\Modules\Institution\Enums\RecordStatus;
 use App\Modules\Institution\Models\Section;
 use App\Modules\Institution\Models\Term;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Settings\SettingsRepository;
@@ -45,6 +46,7 @@ class OfferingController extends Controller
         $offerings = CourseOffering::query()
             ->with(self::RELATIONS)
             ->where('term_id', $term->id ?? 0)
+            ->when(DepartmentScope::for($request->user(), AcademicsPermissions::View, homeDepartment: true), fn ($query, $departments) => $query->whereHas('course', fn ($query) => $query->whereIn('department_id', $departments)))
             ->when($request->input('filter.department'), fn ($query, $id) => $query->whereHas('course.department', fn ($query) => $query->where('ulid', $id)))
             ->when($request->input('filter.section'), fn ($query, $id) => $query->whereHas('sections.section', fn ($query) => $query->where('ulid', $id)))
             ->when($request->boolean('filter.unallocated'), fn ($query) => $query->whereHas('sections', fn ($query) => $query->doesntHave('allocations')))

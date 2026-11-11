@@ -14,8 +14,11 @@ use Illuminate\Support\Carbon;
  * @property int $term_id
  * @property string $name
  * @property string $type regular|supplementary
- * @property string $status draft|registration_open|registration_closed|results_processed|results_verified|published
+ * @property string $status pending_approval|rejected|draft|registration_open|registration_closed|results_processed|results_verified|published
  * @property Carbon|null $registration_ends_on
+ * @property int|null $approved_by
+ * @property Carbon|null $approved_at
+ * @property string|null $approval_remarks reason when rejected
  * @property int|null $processed_by
  * @property Carbon|null $processed_at
  * @property int|null $verified_by
@@ -31,7 +34,7 @@ class ExamCycle extends TenantModel
 {
     public const TYPES = ['regular', 'supplementary'];
 
-    public const STATUSES = ['draft', 'registration_open', 'registration_closed', 'results_processed', 'results_verified', 'published'];
+    public const STATUSES = ['pending_approval', 'rejected', 'draft', 'registration_open', 'registration_closed', 'results_processed', 'results_verified', 'published'];
 
     protected string $auditLog = 'exams';
 

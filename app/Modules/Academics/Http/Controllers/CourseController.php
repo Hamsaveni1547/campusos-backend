@@ -11,6 +11,7 @@ use App\Modules\Academics\Models\Course;
 use App\Modules\Academics\Services\AcademicsService;
 use App\Modules\Institution\Enums\RecordStatus;
 use App\Modules\Institution\Models\Department;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Tenancy\CurrentInstitution;
@@ -46,8 +47,10 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         Gate::authorize(AcademicsPermissions::View);
+        $departments = DepartmentScope::for($request->user(), AcademicsPermissions::View, homeDepartment: true);
 
         $courses = Course::query()
+            ->when($departments !== null, fn ($query) => $query->whereIn('department_id', $departments))
             ->with('department')
             ->when($request->input('filter.department'), fn ($query, $id) => $query->whereHas('department', fn ($query) => $query->where('ulid', $id)))
             ->when($request->input('filter.type'), fn ($query, $type) => $query->where('type', $type))

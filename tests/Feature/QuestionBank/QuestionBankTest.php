@@ -4,6 +4,7 @@ namespace Tests\Feature\QuestionBank;
 
 use App\Models\User;
 use App\Modules\Identity\Enums\UserStatus;
+use App\Modules\Institution\Models\Department;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionPaper;
 use Database\Factories\UserFactory;
@@ -37,6 +38,8 @@ class QuestionBankTest extends TestCase
         $course = $this->api('POST', 'courses', $admin, ['department_id' => $department['id'], 'code' => '21CS51', 'title' => 'DBMS', 'type' => 'theory', 'credits' => 4])->json('data.id');
         $this->api('POST', 'employees', $admin, ['name' => 'Dr. Kavya', 'email' => 'kavya@example.edu', 'staff_type' => 'teaching', 'employment_type' => 'permanent', 'joined_on' => '2020-06-01', 'send_invite' => false]);
         $kavya = $this->activate('kavya@example.edu');
+        // Question papers are set by the exam cell (examiner role); plain faculty only add questions to their own classes.
+        $this->grantRole($kavya, $institution, 'examiner');
 
         foreach (range(1, 6) as $n) {
             $this->api('POST', 'courses/'.$course.'/questions', $kavya, ['unit' => $n <= 3 ? 1 : 2, 'type' => 'short', 'marks' => 2, 'difficulty' => 'easy', 'bloom_level' => 'remember', 'co_code' => 'CO1', 'text' => "Define term {$n}.", 'answer' => "Term {$n} is…"])->assertCreated();
@@ -93,11 +96,20 @@ class QuestionBankTest extends TestCase
         $paper = $sets[0]['id'];
         $this->api('GET', 'question-papers/'.$paper.'/content', $kavya)->assertOk()->assertJsonPath('data.answers', true)->assertJsonCount(3, 'data.sections.1.questions');
         $this->api('POST', 'question-papers/'.$paper.'/submit', $kavya)->assertOk()->assertJsonPath('data.status', 'submitted');
-        $this->api('POST', 'question-papers/'.$paper.'/review', $kavya, ['approve' => true])->assertForbidden();
+        $this->api('POST', 'question-papers/'.$paper.'/review', $kavya, ['approve' => true])->assertStatus(409);
 
-        $hod = $this->member($institution, ['hod'], ['email' => 'hod@example.edu']);
-        $this->api('POST', 'question-papers/'.$paper.'/review', $hod, ['approve' => false])->assertStatus(422)->assertJsonPath('code', 'REMARKS_REQUIRED');
-        $this->api('POST', 'question-papers/'.$paper.'/review', $hod, ['approve' => true])->assertOk()->assertJsonPath('data.status', 'approved');
+        $hod = $this->member($institution, [], ['email' => 'hod@example.edu']);
+        $this->grantRole($hod, $institution, 'hod', (int) Department::query()->withoutGlobalScopes()->where('code', 'CSE')->value('id'));
+        $this->api('GET', 'question-papers/'.$paper, $hod)->assertNotFound();
+        $this->api('POST', 'question-papers/'.$paper.'/review', $hod, ['approve' => true])->assertForbidden();
+
+        $reviewer = $this->member($institution, ['examiner'], ['email' => 'coe@example.edu']);
+        $this->api('POST', 'question-papers/'.$paper.'/review', $reviewer, ['approve' => false])->assertStatus(422)->assertJsonPath('code', 'REMARKS_REQUIRED');
+        $this->api('POST', 'question-papers/'.$paper.'/review', $reviewer, ['approve' => true])->assertOk()->assertJsonPath('data.status', 'approved');
+
+        // The HOD sees the paper of their department only once it is approved.
+        $this->api('GET', 'question-papers/'.$paper, $hod)->assertOk();
+        $this->api('GET', 'question-papers/'.$paper.'/content', $hod)->assertOk();
         $this->api('POST', 'question-papers/'.$paper.'/seal', $hod)->assertForbidden();
         $this->api('POST', 'question-papers/'.$paper.'/seal', $admin)->assertOk()->assertJsonPath('data.status', 'sealed');
 
@@ -119,7 +131,7 @@ class QuestionBankTest extends TestCase
         $this->api('GET', 'courses/'.$course.'/upcoming-exams', $kavya)->assertOk()->assertJsonPath('data.0.id', $exam)->assertJsonPath('data.0.starts_at', '10:00');
         $later = $this->api('POST', 'paper-blueprints/'.$blueprint.'/generate', $kavya, ['sets' => 1, 'exam_schedule_id' => $exam])->json('data.0.id');
         $this->api('POST', 'question-papers/'.$later.'/submit', $kavya);
-        $this->api('POST', 'question-papers/'.$later.'/review', $hod, ['approve' => true]);
+        $this->api('POST', 'question-papers/'.$later.'/review', $reviewer, ['approve' => true]);
         $this->api('POST', 'question-papers/'.$later.'/seal', $admin);
 
         $this->travelTo(now()->setTime(9, 20));
@@ -129,7 +141,7 @@ class QuestionBankTest extends TestCase
         $this->assertNull($released->json('data.sections.0.questions.0.answer'));
         $this->assertStringStartsWith('Define term', $released->json('data.sections.0.questions.0.text'));
 
-        $this->api('GET', 'question-papers/'.$later.'/access-logs', $kavya)->assertForbidden();
+        $this->api('GET', 'question-papers/'.$later.'/access-logs', $hod)->assertForbidden();
         $this->assertSame(['released', 'release_refused', 'sealed'], array_column($this->api('GET', 'question-papers/'.$later.'/access-logs', $admin)->assertOk()->json('data'), 'action'));
         $this->assertSame(['release_refused', 'sealed', 'viewed'], array_values(array_unique(array_column($this->api('GET', 'question-papers/'.$paper.'/access-logs', $admin)->json('data'), 'action'))));
     }

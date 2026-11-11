@@ -13,7 +13,7 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready'])->gro
     Route::get('exam-cycles/{cycle}', [ExamController::class, 'show'])->name('exam-cycles.show');
     Route::patch('exam-cycles/{cycle}', [ExamController::class, 'update'])->name('exam-cycles.update');
     Route::post('exam-cycles/{cycle}/{action}', [ExamController::class, 'transition'])
-        ->whereIn('action', ['open-registration', 'close-registration', 'eligibility', 'process', 'verify', 'publish'])->name('exam-cycles.transition');
+        ->whereIn('action', ['open-registration', 'close-registration', 'eligibility', 'process', 'verify', 'publish', 'approve', 'reject'])->name('exam-cycles.transition');
     Route::get('exam-cycles/{cycle}/registrations', [ExamController::class, 'registrations'])->name('exam-cycles.registrations');
     Route::get('exam-cycles/{cycle}/results', [ExamController::class, 'results'])->name('exam-cycles.results');
     Route::post('exam-registrations/{registration}/override', [ExamController::class, 'override'])->name('exam-registrations.override');

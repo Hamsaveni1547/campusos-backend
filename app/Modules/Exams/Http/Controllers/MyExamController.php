@@ -4,6 +4,7 @@ namespace App\Modules\Exams\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Academics\Models\Course;
+use App\Modules\Academics\Models\TermRegistration;
 use App\Modules\Exams\Authorization\ExamPermissions;
 use App\Modules\Exams\Models\ExamCycle;
 use App\Modules\Exams\Models\ExamRegistration;
@@ -119,15 +120,19 @@ class MyExamController extends Controller
 
     private function history(Student $student): JsonResponse
     {
-        $results = ExamResult::query()->with('cycle')->where('student_id', $student->id)->whereHas('cycle', fn ($query) => $query->where('status', 'published'))->get()->sortByDesc('exam_cycle_id');
+        $results = ExamResult::query()->with('cycle.term')->where('student_id', $student->id)->whereHas('cycle', fn ($query) => $query->where('status', 'published'))->get()->sortByDesc('exam_cycle_id');
         $rows = ExamRegistration::query()->with('course')->where('student_id', $student->id)->whereIn('exam_cycle_id', $results->pluck('exam_cycle_id'))->get();
         $revaluations = RevaluationRequest::query()->whereIn('exam_registration_id', $rows->pluck('id'))->get()->keyBy('exam_registration_id');
+        $semesters = TermRegistration::query()->where('student_id', $student->id)->pluck('term_number', 'term_id');
+        $points = collect($this->exams->rules()['grades'])->mapWithKeys(fn (array $band): array => [$band['grade'] => $band['points']]);
 
         return ApiResponse::data([
             'cgpa' => $results->first()?->cgpa === null ? null : (float) $results->first()->cgpa,
             'backlogs' => $results->first()->backlogs ?? 0,
             'results' => $results->map(fn (ExamResult $result): array => [
-                'cycle' => ['id' => $result->cycle->ulid, 'name' => $result->cycle->name, 'published_at' => $result->cycle->published_at?->toIso8601String()],
+                'cycle' => ['id' => $result->cycle->ulid, 'name' => $result->cycle->name, 'type' => $result->cycle->type, 'published_at' => $result->cycle->published_at?->toIso8601String()],
+                'term' => $result->cycle->term->name,
+                'semester' => ($n = $semesters->get($result->cycle->term_id)) === null ? null : (int) $n,
                 'sgpa' => $result->sgpa === null ? null : (float) $result->sgpa,
                 'cgpa' => $result->cgpa === null ? null : (float) $result->cgpa,
                 'credits_earned' => (float) $result->credits_earned,
@@ -139,7 +144,9 @@ class MyExamController extends Controller
                     'credits' => (float) $r->course->credits,
                     'internal' => $r->internal_marks === null ? null : (float) $r->internal_marks,
                     'external' => $r->external_marks === null ? null : (float) $r->external_marks,
+                    'total' => $r->internal_marks === null && $r->external_marks === null ? null : (float) $r->internal_marks + (float) $r->external_marks,
                     'grade' => $r->grade,
+                    'grade_points' => $r->grade === null ? null : (float) ($points[$r->grade] ?? 0),
                     'passed' => $r->passed,
                     'revaluation' => ($rv = $revaluations->get($r->id)) === null ? null : ['status' => $rv->status, 'old_marks' => $rv->old_marks === null ? null : (float) $rv->old_marks, 'new_marks' => $rv->new_marks === null ? null : (float) $rv->new_marks, 'remarks' => $rv->remarks],
                     'can_request_revaluation' => $r->attendance === 'present' && ! $revaluations->has($r->id),

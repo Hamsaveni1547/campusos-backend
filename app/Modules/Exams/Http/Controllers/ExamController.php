@@ -52,7 +52,12 @@ class ExamController extends Controller
         Gate::authorize(ExamPermissions::CyclesManage);
         $cycle = ExamCycle::query()->create($this->validated($request));
 
-        return ApiResponse::data($this->cycle($cycle->load('term')), 201);
+        // Cycles set up by the exam cell wait for the principal or admin; approvers' own cycles start ready.
+        if (! $this->user($request)->can(ExamPermissions::CyclesApprove)) {
+            $cycle->forceFill(['status' => 'pending_approval'])->save();
+        }
+
+        return ApiResponse::data($this->cycle($cycle->refresh()->load('term')), 201);
     }
 
     public function show(Request $request, ExamCycle $cycle): JsonResponse
@@ -71,6 +76,7 @@ class ExamController extends Controller
             'schedules' => $cycle->schedules()->with('course')->orderBy('exam_date')->orderBy('starts_at')->get()->map(fn (ExamSchedule $s): array => $this->schedule($s, $cycle))->values(),
             'can' => [
                 'manage' => $user->can(ExamPermissions::CyclesManage),
+                'approve' => $cycle->status === 'pending_approval' && $user->can(ExamPermissions::CyclesApprove),
                 'process' => $cycle->isEvaluating() && $user->can(ExamPermissions::ResultsProcess),
                 'verify' => $cycle->status === 'results_processed' && $cycle->processed_by !== $user->id && $user->can(ExamPermissions::ResultsVerify),
                 'publish' => $cycle->status === 'results_verified' && $user->can(ExamPermissions::ResultsPublish),
@@ -101,6 +107,8 @@ class ExamController extends Controller
             'process' => [ExamPermissions::ResultsProcess, fn () => $this->exams->process($cycle, $user)],
             'verify' => [ExamPermissions::ResultsVerify, fn () => $this->exams->verify($cycle, $user)],
             'publish' => [ExamPermissions::ResultsPublish, fn () => $this->exams->publish($cycle, $user)],
+            'approve' => [ExamPermissions::CyclesApprove, fn () => $this->exams->approveCycle($cycle, $user)],
+            'reject' => [ExamPermissions::CyclesApprove, fn () => $this->exams->rejectCycle($cycle, $user, (string) $request->validate(['reason' => ['required', 'string', 'max:500']])['reason'])],
         ];
         abort_unless(isset($steps[$action]), 404);
         [$permission, $run] = $steps[$action];
@@ -304,6 +312,7 @@ class ExamController extends Controller
             'status' => $cycle->status,
             'term' => ['id' => $cycle->term->ulid, 'name' => $cycle->term->name],
             'registration_ends_on' => $cycle->registration_ends_on?->toDateString(),
+            'approval_remarks' => $cycle->approval_remarks,
             'registrations' => $cycle->registrations_count ?? null,
             'published_at' => $cycle->published_at?->toIso8601String(),
         ];

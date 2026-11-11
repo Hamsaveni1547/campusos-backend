@@ -4,13 +4,16 @@ namespace App\Modules\QuestionBank\Http\Controllers;
 
 use App\Models\User;
 use App\Modules\Academics\Models\Course;
+use App\Modules\Academics\Models\FacultyAllocation;
 use App\Modules\Exams\Models\ExamSchedule;
+use App\Modules\Identity\Authorization\SystemRole;
 use App\Modules\QuestionBank\Authorization\QuestionBankPermissions as P;
 use App\Modules\QuestionBank\Models\PaperAccessLog;
 use App\Modules\QuestionBank\Models\PaperBlueprint;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionPaper;
 use App\Modules\QuestionBank\Services\QuestionBankService;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use App\Shared\Settings\SettingsRepository;
@@ -175,10 +178,15 @@ class QuestionBankController extends Controller
      */
     public function papers(Request $request): JsonResponse
     {
-        $this->authorizeAny($request, [P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView]);
+        $this->authorizeAny($request, [P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView, P::PapersView]);
         $filters = (array) $request->input('filter', []);
+        $user = $this->user($request);
+        $viewerOnly = ! $user->canAny([P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView]);
+        $allowed = $this->allowedCourseIds($user);
 
         $papers = QuestionPaper::query()->with(['course', 'blueprint', 'schedule.cycle', 'setter'])
+            ->when($viewerOnly, fn ($query) => $query->whereIn('status', ['approved', 'sealed']))
+            ->when($allowed !== null, fn ($query) => $query->whereIn('course_id', $allowed))
             ->when($filters['course'] ?? null, fn ($query, $ulid) => $query->whereHas('course', fn ($q) => $q->where('ulid', $ulid)))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->latest('id')
@@ -189,7 +197,11 @@ class QuestionBankController extends Controller
 
     public function show(Request $request, QuestionPaper $paper): JsonResponse
     {
-        $this->authorizeAny($request, [P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView]);
+        $this->authorizeAny($request, [P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView, P::PapersView]);
+        $user = $this->user($request);
+        $allowed = $this->allowedCourseIds($user);
+        abort_if($allowed !== null && ! in_array($paper->course_id, $allowed, true), 404);
+        abort_if(! $user->canAny([P::PapersSet, P::PapersReview, P::PapersSeal, P::PapersRelease, P::LogsView]) && ! in_array($paper->status, ['approved', 'sealed'], true), 404);
 
         return ApiResponse::data($this->paper($paper->load(['course', 'blueprint', 'schedule.cycle', 'setter', 'approver']), $this->user($request)));
     }
@@ -372,7 +384,45 @@ class QuestionBankController extends Controller
 
     private function course(string $ulid): Course
     {
-        return Course::query()->where('ulid', $ulid)->firstOrFail();
+        $course = Course::query()->where('ulid', $ulid)->firstOrFail();
+        $allowed = $this->allowedCourseIds($this->user(request()));
+        abort_if($allowed !== null && ! in_array($course->id, $allowed, true), 403, 'You can only work on the question bank of your own courses.');
+
+        return $course;
+    }
+
+    /**
+     * Courses this user may use in the question bank: all (null) for the exam cell and admin; a HOD's department;
+     * a teacher's allocated courses.
+     *
+     * @return list<int>|null
+     */
+    private function allowedCourseIds(User $user): ?array
+    {
+        $permissions = [P::QuestionsContribute, P::QuestionsManage, P::PapersSet, P::PapersReview, P::PapersView];
+
+        if (DepartmentScope::onlyRole($user, $permissions, SystemRole::Faculty->value)) {
+            return FacultyAllocation::query()->join('employees', 'employees.id', '=', 'faculty_allocations.employee_id')
+                ->join('offering_sections', 'offering_sections.id', '=', 'faculty_allocations.offering_section_id')
+                ->join('course_offerings', 'course_offerings.id', '=', 'offering_sections.course_offering_id')
+                ->where('employees.user_id', $user->id)->distinct()->pluck('course_offerings.course_id')->map(fn ($id): int => (int) $id)->all();
+        }
+
+        $departments = DepartmentScope::for($user, $permissions, homeDepartment: true);
+
+        return $departments === null ? null : Course::query()->whereIn('department_id', $departments)->pluck('id')->map(fn ($id): int => (int) $id)->all();
+    }
+
+    /**
+     * Courses I can open in the question bank.
+     */
+    public function courses(Request $request): JsonResponse
+    {
+        $this->authorizeAny($request, [P::QuestionsContribute, P::QuestionsManage, P::PapersSet, P::PapersReview, P::PapersView]);
+        $allowed = $this->allowedCourseIds($this->user($request));
+
+        return ApiResponse::list(Course::query()->where('status', 'active')->when($allowed !== null, fn ($q) => $q->whereIn('id', $allowed))->orderBy('code')->get(),
+            fn (Course $c): array => ['id' => $c->ulid, 'code' => $c->code, 'title' => $c->title]);
     }
 
     /**

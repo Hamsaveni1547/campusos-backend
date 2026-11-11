@@ -20,6 +20,8 @@ class QuestionBankPermissions implements PermissionProvider
 
     public const LogsView = 'qbank.logs.view';
 
+    public const PapersView = 'qbank.papers.view';
+
     public static function module(): string
     {
         return 'qbank';
@@ -35,6 +37,7 @@ class QuestionBankPermissions implements PermissionProvider
             self::PapersSeal => ['description' => 'Seal approved question papers', 'sensitive' => true],
             self::PapersRelease => ['description' => 'Open sealed question papers in the release window before the exam', 'sensitive' => true],
             self::LogsView => ['description' => 'View who opened question papers', 'sensitive' => true],
+            self::PapersView => ['description' => 'View question papers of your department once the exam cell has approved them', 'sensitive' => true],
         ];
     }
 }

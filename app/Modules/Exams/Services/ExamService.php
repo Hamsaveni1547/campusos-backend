@@ -403,6 +403,20 @@ class ExamService
         ];
     }
 
+    // ----- approval ----------------------------------------------------------
+
+    public function approveCycle(ExamCycle $cycle, User $user): void
+    {
+        $this->assertStatus($cycle, 'pending_approval');
+        $cycle->forceFill(['status' => 'draft', 'approved_by' => $user->id, 'approved_at' => now(), 'approval_remarks' => null])->save();
+    }
+
+    public function rejectCycle(ExamCycle $cycle, User $user, string $reason): void
+    {
+        $this->assertStatus($cycle, 'pending_approval');
+        $cycle->forceFill(['status' => 'rejected', 'approved_by' => $user->id, 'approved_at' => now(), 'approval_remarks' => $reason])->save();
+    }
+
     private function assertStatus(ExamCycle $cycle, string $status): void
     {
         if ($cycle->status !== $status) {

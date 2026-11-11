@@ -178,7 +178,8 @@ class QuestionBankService
     public function content(QuestionPaper $paper, User $user, ?string $ip): array
     {
         if ($paper->status !== 'sealed') {
-            abort_unless($user->canAny([QuestionBankPermissions::PapersSet, QuestionBankPermissions::PapersReview]), 403);
+            $viewerOnly = ! $user->canAny([QuestionBankPermissions::PapersSet, QuestionBankPermissions::PapersReview]);
+            abort_if($viewerOnly && ! ($paper->status === 'approved' && $user->can(QuestionBankPermissions::PapersView)), 403);
             $this->log($paper, $user, 'viewed', $ip);
 
             return ['sections' => $this->build($paper, withAnswers: true), 'answers' => true];

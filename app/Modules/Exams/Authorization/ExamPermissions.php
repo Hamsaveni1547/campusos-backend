@@ -8,6 +8,8 @@ class ExamPermissions implements PermissionProvider
 {
     public const CyclesManage = 'exams.cycles.manage';
 
+    public const CyclesApprove = 'exams.cycles.approve';
+
     public const EligibilityOverride = 'exams.eligibility.override';
 
     public const EvaluationEnter = 'exams.evaluation.enter';
@@ -33,6 +35,7 @@ class ExamPermissions implements PermissionProvider
     {
         return [
             self::CyclesManage => ['description' => 'Create exam cycles, open and close registration, and set the exam timetable'],
+            self::CyclesApprove => ['description' => 'Approve or reject new exam cycles before registration can open'],
             self::EligibilityOverride => ['description' => 'Make a student eligible for an exam despite shortages', 'sensitive' => true],
             self::EvaluationEnter => ['description' => 'Enter external marks against script codes'],
             self::ScriptsDecode => ['description' => 'See which student wrote which answer script', 'sensitive' => true],

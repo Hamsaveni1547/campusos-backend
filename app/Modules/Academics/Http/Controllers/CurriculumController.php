@@ -9,6 +9,7 @@ use App\Modules\Academics\Models\Course;
 use App\Modules\Academics\Models\Curriculum;
 use App\Modules\Academics\Services\AcademicsService;
 use App\Modules\Institution\Models\Programme;
+use App\Shared\Authorization\DepartmentScope;
 use App\Shared\Exceptions\BusinessRuleException;
 use App\Shared\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -31,8 +32,10 @@ class CurriculumController extends Controller
     public function index(Request $request): JsonResponse
     {
         Gate::authorize(AcademicsPermissions::View);
+        $departments = DepartmentScope::for($request->user(), AcademicsPermissions::View, homeDepartment: true);
 
         $curricula = Curriculum::query()
+            ->when($departments !== null, fn ($query) => $query->whereHas('programme', fn ($query) => $query->whereIn('department_id', $departments)))
             ->with(['programme', 'approver'])
             ->withCount('entries')
             ->when($request->input('filter.programme'), fn ($query, $id) => $query->whereHas('programme', fn ($query) => $query->where('ulid', $id)))
