@@ -2,6 +2,7 @@
 
 use App\Modules\AI\Http\Controllers\AiFeatureController;
 use App\Modules\AI\Http\Controllers\AiUsageController;
+use App\Modules\AI\Http\Controllers\AssistantController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready', 'throttle:30,1'])->prefix('ai')->name('ai.')->group(function (): void {
@@ -15,4 +16,10 @@ Route::middleware(['auth:sanctum', 'resolve.institution', 'account.ready', 'thro
     Route::post('complaints/suggest-category', [AiFeatureController::class, 'suggestComplaintCategory'])->name('complaints.suggest');
     Route::get('complaints/{complaint}/triage', [AiFeatureController::class, 'triageComplaint'])->name('complaints.triage');
     Route::get('surveys/{survey}/insights', [AiFeatureController::class, 'surveyInsights'])->name('surveys.insights');
+
+    // A2: Ask CampusOS assistant
+    Route::get('assistant', [AssistantController::class, 'index'])->name('assistant.index');
+    Route::post('assistant/messages', [AssistantController::class, 'ask'])->name('assistant.ask');
+    Route::get('assistant/conversations/{conversation}', [AssistantController::class, 'show'])->name('assistant.show');
+    Route::delete('assistant/conversations/{conversation}', [AssistantController::class, 'destroy'])->name('assistant.destroy');
 });
