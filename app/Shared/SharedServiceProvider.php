@@ -4,6 +4,7 @@ namespace App\Shared;
 
 use App\Models\User;
 use App\Modules\Identity\Models\PersonalAccessToken;
+use App\Shared\Authorization\ModuleAccess;
 use App\Shared\Authorization\PermissionRegistry;
 use App\Shared\Files\FileAccessPolicy;
 use App\Shared\Files\FileStorage;
@@ -14,6 +15,7 @@ use App\Shared\Settings\SettingsRegistry;
 use App\Shared\Settings\SettingsRepository;
 use App\Shared\Tenancy\CurrentInstitution;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +39,17 @@ class SharedServiceProvider extends ServiceProvider
         $this->app->singleton(FileAccessPolicy::class);
         $this->app->singleton(ImportManager::class);
         $this->app->singleton(NumberGenerator::class);
+        $this->app->singleton(ModuleAccess::class);
+
+        // Registered here (before packages boot) so it runs before spatie's permission check:
+        // a permission of a module switched off for the institution is always denied.
+        $this->app->afterResolving(Gate::class, function (Gate $gate): void {
+            $gate->before(function (?User $user, string $ability): ?bool {
+                $institutionId = $this->app->make(CurrentInstitution::class)->id();
+
+                return $this->app->make(ModuleAccess::class)->allows($ability, $institutionId) ? null : false;
+            });
+        });
     }
 
     public function boot(SettingsRegistry $settings): void

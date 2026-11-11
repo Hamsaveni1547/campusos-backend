@@ -23,6 +23,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
  * @property bool $is_system
  * @property bool $is_active
  * @property bool $is_department_scoped
+ * @property bool $is_customised edited by the platform admin; the permission sync keeps its grants
  */
 class Role extends SpatieRole
 {
@@ -36,6 +37,7 @@ class Role extends SpatieRole
             'is_system' => 'boolean',
             'is_active' => 'boolean',
             'is_department_scoped' => 'boolean',
+            'is_customised' => 'boolean',
         ];
     }
 

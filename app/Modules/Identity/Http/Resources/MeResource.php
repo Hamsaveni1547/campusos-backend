@@ -7,6 +7,7 @@ use App\Modules\Identity\Http\Middleware\EnsureAccountReady;
 use App\Modules\Identity\Services\MfaRequirement;
 use App\Modules\Identity\Services\PasswordPolicy;
 use App\Modules\Institution\Http\Resources\InstitutionSummaryResource;
+use App\Shared\Authorization\ModuleAccess;
 use App\Shared\Tenancy\CurrentInstitution;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -54,7 +55,8 @@ class MeResource extends JsonResource
                 $this->institutions()->wherePivot('status', 'active')->orderBy('name')->get()
             ),
             'roles' => $institutionId === null ? [] : $this->getRoleNames()->values(),
-            'permissions' => $institutionId === null ? [] : $this->getAllPermissions()->pluck('name')->sort()->values(),
+            'permissions' => $institutionId === null ? [] : $this->getAllPermissions()->pluck('name')
+                ->filter(fn (string $name): bool => app(ModuleAccess::class)->allows($name, $institutionId))->sort()->values(),
         ];
     }
 }

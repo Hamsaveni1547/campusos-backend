@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Identity\Http\Controllers\PlatformAccessController;
 use App\Modules\SystemAdmin\Authorization\SystemAdminPermissions;
 use App\Modules\SystemAdmin\Http\Controllers\AuditController;
 use App\Modules\SystemAdmin\Http\Controllers\MonitoringController;
@@ -34,4 +35,15 @@ Route::middleware(['auth:sanctum', 'platform.admin', 'resolve.institution:option
         Route::get('monitoring/failed-jobs', [MonitoringController::class, 'failedJobs'])->name('monitoring.failed-jobs');
         Route::post('monitoring/failed-jobs/{job}/retry', [MonitoringController::class, 'retryFailedJob'])->name('monitoring.failed-jobs.retry');
         Route::delete('monitoring/failed-jobs/{job}', [MonitoringController::class, 'forgetFailedJob'])->name('monitoring.failed-jobs.forget');
+
+        // Access control: modules, permissions, built-in roles and the role × permission matrix
+        Route::get('access/modules', [PlatformAccessController::class, 'modules'])->name('access.modules');
+        Route::get('access/permissions', [PlatformAccessController::class, 'permissions'])->name('access.permissions');
+        Route::get('access/roles', [PlatformAccessController::class, 'roles'])->name('access.roles.index');
+        Route::get('access/roles/{systemRole}', [PlatformAccessController::class, 'show'])->name('access.roles.show');
+        Route::patch('access/roles/{systemRole}', [PlatformAccessController::class, 'updateRole'])->name('access.roles.update');
+        Route::put('access/roles/{systemRole}/permissions', [PlatformAccessController::class, 'updatePermissions'])->name('access.roles.permissions');
+        Route::post('access/roles/{systemRole}/reset', [PlatformAccessController::class, 'reset'])->name('access.roles.reset');
+        Route::get('institutions/{institution}/modules', [PlatformAccessController::class, 'institutionModules'])->name('institutions.modules');
+        Route::put('institutions/{institution}/modules', [PlatformAccessController::class, 'updateInstitutionModules'])->name('institutions.modules.update');
     });

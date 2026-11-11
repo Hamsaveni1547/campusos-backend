@@ -28,6 +28,9 @@ class SyncSystemPermissions
         $definitions = $this->registry->all();
 
         return DB::transaction(function () use ($definitions): array {
+            $existing = Permission::query()->pluck('name')->all();
+            $new = array_values(array_diff(array_keys($definitions), $existing));
+
             foreach ($definitions as $name => $definition) {
                 Permission::query()->updateOrCreate(
                     ['name' => $name, 'guard_name' => 'web'],
@@ -43,6 +46,16 @@ class SyncSystemPermissions
                 /** @var Role $role */
                 $role = Role::query()->firstOrNew(['name' => $systemRole->value, 'guard_name' => 'web', 'institution_id' => null]);
 
+                $defaults = $this->registry->expand($systemRole->permissionPatterns());
+
+                // A role the platform admin edited keeps its name, description and grants;
+                // it only receives permissions that are new in this release (by its defaults).
+                if ($role->exists && $role->is_customised) {
+                    $role->givePermissionTo(array_values(array_intersect($defaults, $new)));
+
+                    continue;
+                }
+
                 $role->forceFill([
                     'display_name' => $systemRole->displayName(),
                     'description' => $systemRole->description(),
@@ -51,7 +64,7 @@ class SyncSystemPermissions
                     'is_department_scoped' => $systemRole->isDepartmentScoped(),
                 ])->save();
 
-                $role->syncPermissions($this->registry->expand($systemRole->permissionPatterns()));
+                $role->syncPermissions($defaults);
             }
 
             $this->registrar->forgetCachedPermissions();
