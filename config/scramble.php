@@ -33,6 +33,12 @@ return [
     'export_path' => 'docs/api/openapi.json',
 
     /*
+     * Build the docs on every visit (slow: 30 s+, blocks the dev server). When false, /docs/api serves the
+     * exported file from export_path; refresh it with `php artisan scramble:export`.
+     */
+    'live' => (bool) env('API_DOCS_LIVE', false),
+
+    /*
      * Cache configuration for the generated OpenAPI document.
      *
      * Use `scramble:cache` to warm the cache and `scramble:clear` to invalidate it.

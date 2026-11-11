@@ -31,10 +31,30 @@ class FileStorage
     /**
      * Validate and store an upload for a purpose defined in config/campusos.php.
      */
+    /**
+     * Office files are zip or OLE containers; content sniffing often reports them as "application/zip" or
+     * "application/octet-stream". For those containers only, trust the Office extension.
+     */
+    private static function officeMimeType(UploadedFile $upload, string $detected): string
+    {
+        $containers = ['application/zip', 'application/octet-stream', 'application/x-ole-storage', 'application/CDFV2', 'application/vnd.ms-office'];
+        $byExtension = [
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'xls' => 'application/vnd.ms-excel',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
+        $extension = strtolower($upload->getClientOriginalExtension());
+
+        return in_array($detected, $containers, true) && isset($byExtension[$extension]) ? $byExtension[$extension] : $detected;
+    }
+
     public function store(UploadedFile $upload, string $purpose, ?User $uploader, ?Model $attachTo = null): StoredFile
     {
         $definition = $this->purpose($purpose);
-        $mimeType = (string) $upload->getMimeType();
+        $mimeType = self::officeMimeType($upload, (string) $upload->getMimeType());
 
         if (! in_array($mimeType, $definition['mimes'], true)) {
             throw new BusinessRuleException(

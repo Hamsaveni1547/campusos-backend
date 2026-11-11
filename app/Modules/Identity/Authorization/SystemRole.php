@@ -152,6 +152,7 @@ enum SystemRole: string
                 'identity.role_assignments.view',
                 'hr.*',
                 'leave.*',
+                'payroll.reports.view',
                 'communication.announcements.publish',
             ],
             self::Hod => [

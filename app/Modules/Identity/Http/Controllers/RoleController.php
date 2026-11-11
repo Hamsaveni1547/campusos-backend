@@ -26,11 +26,11 @@ class RoleController extends Controller
     ) {}
 
     /**
-     * Built-in and custom roles of the institution.
+     * Built-in and custom roles of the institution. Also readable by whoever manages users (to pick roles).
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        Gate::authorize(IdentityPermissions::RolesView);
+        abort_unless($request->user()?->canAny([IdentityPermissions::RolesView, IdentityPermissions::UsersView]), 403);
         $institutionId = $this->currentInstitution->require()->id;
 
         $roles = Role::query()
